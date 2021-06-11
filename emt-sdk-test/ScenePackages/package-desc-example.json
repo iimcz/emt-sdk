@@ -1,0 +1,91 @@
+{
+    "$schema": "./package-schema.json",
+    "version": "1.0",
+    "package": {
+        "type": "data",
+        "url": "https://emtoolboxstore/package.zip",
+        "checksum": "asd645sa786a4d5as6d7a8s64ae54r86ea486da6s"
+    },
+    "metadata": {
+        "author": "",
+        "exposition": "",
+        "other": {}
+    },
+    
+    "inputs": [
+        {
+            "name": "ActionA",
+            "type": "gesture",
+            "mapping": {
+                "source": "mainWall_camera1",
+                "gestureName": "swipeLeft"
+            }
+        },
+        {
+            "name": "ActionB",
+            "type": "gestureDrag",
+            "mapping": {
+                "source": "mainWall_camera1",
+                "startGesture": "grab",
+                "endGesture": "release",
+                "position": "handCursor"
+            }
+        },
+        {
+            "name": "ActionC",
+            "type": "value",
+            "mapping": {
+                "source": "raspi1_temperature"
+            }
+        },
+        {
+            "name": "ActionD",
+            "type": "valueTrigger",
+            "mapping": {
+                "source": "raspi1_volume",
+                "condition": "above",
+                "threshold": "1.0"
+            }
+        },
+        {
+            "name": "ActionE",
+            "type": "event",
+            "mapping": {
+                "source": "secondaryWall_events",
+                "eventName": "stop"
+            }
+        }
+    ],
+
+    "parameters": {
+        "displayType": "gallery",
+        "settings": [
+            {
+                "key": "columns", "value": "5"
+            },
+            {
+                "key": "center", "value": "true"
+            }
+        ]
+    },
+
+    "sync": {
+        "canvasDimensions": {
+            "width": 3640,
+            "height": 1024
+        },
+        "selfIndex": 0,
+        "elements": [
+            {
+                "role": "primary",
+                "hostname": "mainWall",
+                "viewportTransform": "1920x1024+100+0"
+            },
+            {
+                "role": "secondary",
+                "hostname": "secondaryWall",
+                "viewportTransform": "1920x1024-100+0"
+            }
+        ]
+    }
+}

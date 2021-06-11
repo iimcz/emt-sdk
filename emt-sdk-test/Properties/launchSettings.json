@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "emt-sdk-test": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -1,0 +1,3 @@
+[submodule "emt-common"]
+	path = emt-sdk/emt-common
+	url = https://github.com/iimcz/emt-common
