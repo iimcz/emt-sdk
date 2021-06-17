@@ -19,10 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ScenePackages\package-desc-example-invalid.json">
+    <None Update="ScenePackage\package-desc-example-invalid.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="ScenePackages\package-desc-example.json">
+    <None Update="ScenePackage\package-desc-example.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

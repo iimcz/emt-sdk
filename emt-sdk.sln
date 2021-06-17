@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.31321.278
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "emt-sdk", "emt-sdk\emt-sdk.csproj", "{F12BD47C-5BA1-4EF8-8882-535E578A1981}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "emt-sdk-test", "emt-sdk-test\emt-sdk-test.csproj", "{B173673C-2856-4948-82BB-480A7EBFE91F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "emt-sdk-test", "emt-sdk-test\emt-sdk-test.csproj", "{B173673C-2856-4948-82BB-480A7EBFE91F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "emt-sdk-poc", "emt-sdk-poc\emt-sdk-poc.csproj", "{77F7F77C-6403-4A90-90E9-2486499ED7A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{B173673C-2856-4948-82BB-480A7EBFE91F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B173673C-2856-4948-82BB-480A7EBFE91F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B173673C-2856-4948-82BB-480A7EBFE91F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77F7F77C-6403-4A90-90E9-2486499ED7A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77F7F77C-6403-4A90-90E9-2486499ED7A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77F7F77C-6403-4A90-90E9-2486499ED7A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77F7F77C-6403-4A90-90E9-2486499ED7A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
