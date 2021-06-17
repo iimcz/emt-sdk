@@ -1,4 +1,4 @@
-using emt_sdk.ScenePackages;
+using emt_sdk.ScenePackage;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
