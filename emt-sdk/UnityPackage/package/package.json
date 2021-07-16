@@ -1,0 +1,16 @@
+{
+    "name": "cz.naki3d.emt-sdk",
+    "version": "1.0.0",
+    "displayName": "EMT SDK",
+    "description": "SDK For creating IPW compatible software",
+    "unity": "2020.3",
+    "unityRelease": "12f1",
+    "keywords": [
+        "ipw",
+        "naki3d",
+        "emt-sdk"
+    ],
+    "author": {
+        "name": "Naki3D"
+    }
+}
