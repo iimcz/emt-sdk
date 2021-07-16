@@ -74,6 +74,9 @@
     <None Update="UnityPackage\package\Runtime\System.Runtime.CompilerServices.Unsafe.dll.meta">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="UnityPackage\package\Runtime\System.Runtime.Loader.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="UnityPackage\package\Runtime\System.Runtime.Loader.dll.meta">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
