@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -9,9 +9,17 @@
 
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.17.2" />
+    <PackageReference Include="Grpc.Tools" Version="2.38.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.10.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="../emt-common/protobuf/*.proto" />
   </ItemGroup>
 
   <ItemGroup>
