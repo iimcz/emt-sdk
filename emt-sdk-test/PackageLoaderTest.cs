@@ -31,7 +31,8 @@ namespace emt_sdk_test
             PackageLoader loader = new PackageLoader();
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                loader.LoadPackage(null);
+                TextReader nullReader = null;
+                loader.LoadPackage(nullReader, false);
             });
         }
     }
