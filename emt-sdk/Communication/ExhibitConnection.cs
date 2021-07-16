@@ -10,6 +10,18 @@ using System.Timers;
 
 namespace emt_sdk.Communication
 {
+    public enum ConnectionStateEnum
+    {
+        Disconnected,
+        Connected,
+        VersionCheck,
+        VerifyRequest,
+        VerifyWait,
+        Verified,
+        DescriptorSent,
+        PackageInfoReceived
+    }
+
     public class ExhibitConnection : IDisposable
     {
         private readonly double TIMEOUT_INTERVAL = 25_000;
@@ -22,6 +34,7 @@ namespace emt_sdk.Communication
 
         public bool IsConnected => _client.Connected;
         public bool Verified { get; private set; } = false;
+        public ConnectionStateEnum ConnectionState { get; private set; } = ConnectionStateEnum.Disconnected;
         public EncryptionInfo EncryptionInfo { get; private set; } = null;
         public Action<LoadPackage> LoadPackageHandler { get; set; }
         public Action<ClearPackage> ClearPackageHandler { get; set; }
@@ -36,6 +49,7 @@ namespace emt_sdk.Communication
             _timeoutTimer.Elapsed += TimeoutElapsed;
 
             _id = id ?? Dns.GetHostName();
+            ConnectionState = ConnectionStateEnum.Connected;
         }
 
         private void TimeoutElapsed(object sender, ElapsedEventArgs e)
@@ -51,7 +65,9 @@ namespace emt_sdk.Communication
 
         public void Connect()
         {
+            ConnectionState = ConnectionStateEnum.VersionCheck;
             CompareVersions();
+            ConnectionState = ConnectionStateEnum.VerifyRequest;
             RequestConnection();
             _timeoutTimer.Start();
 
@@ -66,6 +82,7 @@ namespace emt_sdk.Communication
                 DeviceDescriptor = descriptor
             };
             msg.WriteJsonTo(_stream);
+            ConnectionState = ConnectionStateEnum.DescriptorSent;
 
             // TODO: Server actually sends no info
             //EncryptionInfo = EncryptionInfo.Parser.ParseJson(_jsonReader.NextJsonObject());
@@ -89,8 +106,11 @@ namespace emt_sdk.Communication
             };
 
             request.WriteJsonTo(_stream);
+
+            ConnectionState = ConnectionStateEnum.VerifyWait;
             var ack = ConnectionAcknowledgement.Parser.ParseJson(_jsonReader.NextJsonObject());
             Verified = ack.Verified;
+            ConnectionState = ConnectionStateEnum.Verified;
             // TODO: Do we need to check hostname? Probably not
         }
 
@@ -117,6 +137,7 @@ namespace emt_sdk.Communication
                 switch (msg.MessageCase)
                 {
                     case ServerMessage.MessageOneofCase.LoadPackage:
+                        ConnectionState = ConnectionStateEnum.PackageInfoReceived;
                         LoadPackageHandler(msg.LoadPackage);
                         break;
                     case ServerMessage.MessageOneofCase.ClearPackage:
