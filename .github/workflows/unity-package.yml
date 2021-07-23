@@ -30,4 +30,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: emt-sdk
-          path: emt-sdk.tgz
+          path: emt-sdk/bin/Release/netstandard2.0/UnityPackage/emt-sdk.tgz
