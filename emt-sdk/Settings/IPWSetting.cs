@@ -1,11 +1,19 @@
-﻿namespace emt_sdk.Settings
+﻿using System.Collections.Generic;
+
+namespace emt_sdk.Settings
 {
     public class IPWSetting
     {
-        public float LensShift { get; set; }
-        public ColorSetting TopScreenColor { get; set; } = new ColorSetting();
-        public ColorSetting BottomScreenColor { get; set; } = new ColorSetting();
-        public SkewSetting TopScreenSkew { get; set; } = new SkewSetting();
-        public SkewSetting BottomScreenSkew { get; set; } = new SkewSetting();
+        public enum IPWOrientation
+        {
+            Vertical,
+            Horizontal,
+            Single
+        }
+
+        public float LensShift { get; set; } = 0.5f;
+        public IPWOrientation Orientation { get; set; }
+
+        public List<DisplaySetting> Displays { get; set; } = new List<DisplaySetting>();
     }
 }
