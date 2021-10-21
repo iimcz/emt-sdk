@@ -55,6 +55,10 @@ namespace emt_sdk_poc
         private static void Instance_OnEventReceived(object sender, Naki3D.Common.Protocol.SensorMessage e)
         {
             Console.WriteLine($"[{e.Timestamp}] ({e.SensorId}) - {e.DataCase}");
+            if (e.DataCase == Naki3D.Common.Protocol.SensorMessage.DataOneofCase.Gesture)
+            {
+                Console.WriteLine(e.Gesture.Type);
+            }
         }
     }
 }
