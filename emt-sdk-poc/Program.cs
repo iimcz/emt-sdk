@@ -5,6 +5,7 @@ using System.IO;
 using System.Net.Sockets;
 using emt_sdk.Extensions;
 using emt_sdk.Events;
+using System.Threading.Tasks;
 
 namespace emt_sdk_poc
 {
@@ -40,7 +41,7 @@ namespace emt_sdk_poc
             Console.WriteLine("Crypto info received, waiting for package");
         }
 
-        static void Main(string[] args)
+        static void EventServer()
         {
             Console.WriteLine("Starting server on port 5000");
             EventManager.Instance.OnEventReceived += Instance_OnEventReceived;
@@ -48,8 +49,6 @@ namespace emt_sdk_poc
             {
                 Elements = new System.Collections.Generic.List<emt_sdk.Generated.ScenePackage.Element>()
             });
-
-            Console.ReadLine();
         }
 
         private static void Instance_OnEventReceived(object sender, Naki3D.Common.Protocol.SensorMessage e)
@@ -59,6 +58,49 @@ namespace emt_sdk_poc
             {
                 Console.WriteLine(e.Gesture.Type);
             }
+        }
+
+        static async Task Relay()
+        {
+            Console.WriteLine("(c)lient or  (s)erver?");
+            var opt = Console.ReadKey(true).KeyChar;
+
+            switch (opt)
+            {
+                case 'c':
+                    var client = new EventRelayClient();
+                    client.OnEventReceived += (s, e) =>
+                    {
+                        Console.WriteLine(e.DataCase);
+                    };
+                    client.Connect();
+                    break;
+                case 's':
+                    var server = new EventRelayServer();
+                    var serverTask = Task.Run(() => server.Listen());
+                    while (!server.IsConnected) { await Task.Delay(100); }
+
+                    while (true)
+                    {
+                        var key = Console.ReadKey(true).Key;
+                        server.RelayLocalEvent(new Naki3D.Common.Protocol.SensorMessage
+                        {
+                            KeyboardUpdate = new Naki3D.Common.Protocol.KeyboardUpdateData
+                            {
+                                Keycode = ((int)key),
+                                Type = Naki3D.Common.Protocol.KeyActionType.KeyDown
+                            }
+                        });
+                    }
+            }
+        }
+
+        static async Task Main(string[] args)
+        {
+            await Relay();
+
+            Console.WriteLine("End of POC");
+            Console.ReadLine();
         }
     }
 }

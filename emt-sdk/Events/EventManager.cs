@@ -1,11 +1,9 @@
-﻿using emt_sdk.Communication;
-using emt_sdk.Extensions;
-using emt_sdk.Generated.ScenePackage;
+﻿using emt_sdk.Generated.ScenePackage;
 using emt_sdk.Settings;
 using Google.Protobuf;
 using Naki3D.Common.Protocol;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -13,19 +11,54 @@ using System.Threading.Tasks;
 
 namespace emt_sdk.Events
 {
+    /// <summary>
+    /// Main emt_sdk event communication server-client used for both receiving and sending events from/to other devices. Should not be used in user code.
+    /// </summary>
     public class EventManager
     {
+        /// <summary>
+        /// Default event listening port and also target port for otehr devices
+        /// </summary>
         public const int SENSOR_MESSAGE_PORT = 5000;
 
+        /// <summary>
+        /// Singleton instance of <see cref="EventManager"/> for easier state management
+        /// </summary>
         public static EventManager Instance { get; } = new EventManager();
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        public bool IsConnectedOutgoing => _outgoingClients.Count == (_sync.Elements.Count - 1);
-        public bool IsConnectedIncoming => _listeners == (_sync.Elements.Count - 1);
-        public bool IsConnected => IsConnectedOutgoing && IsConnectedOutgoing;
+        /// <summary>
+        /// Whether the manager is currently listening for new connections
+        /// </summary>
         public bool IsListening { get; private set; } = false;
 
+        /// <summary>
+        /// Gets the amount of currently connected listeners
+        /// </summary>
+        public int Listeners
+        {
+            get
+            {
+                return _listeners;
+            }
+        }
+
+        /// <summary>
+        /// Handler for receicing sensor events
+        /// </summary>
+        /// <param name="sender">Sender of event, <see cref="EventManager"/> in most cases</param>
+        /// <param name="e">Received message</param>
         public delegate void SensorMessageHandler(object sender, SensorMessage e);
+
+        /// <summary>
+        /// Called whenever an event is received either locally, from other device or from a relay
+        /// </summary>
         public event SensorMessageHandler OnEventReceived;
+
+        /// <summary>
+        /// Token for closing all socket connections, may be closed after receiving one more event per socket
+        /// </summary>
+        public CancellationToken Token => _tokenSource.Token;
 
         private CancellationTokenSource _tokenSource;
         private Sync _sync;
@@ -37,36 +70,67 @@ namespace emt_sdk.Events
         private readonly List<TcpClient> _outgoingClients = new List<TcpClient>();
         private readonly List<NetworkStream> _outgoingStreams = new List<NetworkStream>();
 
+        /// <summary>
+        /// Broadcasts an event to all connected devices and relays (if connected)
+        /// </summary>
+        /// <param name="message">Event to be sent</param>
+        /// <exception cref="ArgumentNullException">Thrown when passed event is null</exception>
         public void BroadcastEvent(SensorMessage message)
         {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+
             // In case it's a local event
             OnEventReceived?.Invoke(this, message);
 
-            foreach (var client in _outgoingStreams) message.WriteJsonTo(client);
+            if (_outgoingStreams.Count == 0)
+            {
+                Logger.Warn("No remote listeners connected, broadcasting event as local only");
+                return;
+            }
+
+            foreach (var client in _outgoingStreams) message.WriteDelimitedTo(client);
         }
 
+        /// <summary>
+        /// Starts listening for incoming connections and connects to other available devices.
+        /// Calls <seealso cref="Start(Sync, string, int)"/> with specified <see cref="CommunicationSettings"/>.
+        /// </summary>
+        /// <param name="sync">Sync data used for connecting to other devices</param>
+        /// <param name="settings">Socket settings</param>
         public void Start(Sync sync, CommunicationSettings settings)
         {
             Start(sync, settings.SensorListenIp, settings.SensorListenPort);
         }
 
+        /// <summary>
+        /// Starts listening for incoming connections and connects to other available devices.
+        /// </summary>
+        /// <param name="sync">Sync data used for connecting to other devices</param>
+        /// <param name="ip">Listening IP asdress</param>
+        /// <param name="port">Listening and target port for both incoming and outgoing sockets</param>
+        /// <exception cref="SocketException">Throw on any socket related problems</exception>
         public void Start(Sync sync, string ip = null, int port = SENSOR_MESSAGE_PORT)
         {
             _sync = sync;
             ip = ip ?? string.Empty;
 
-            if (!IPAddress.TryParse(ip, out var ipAddr)) ipAddr = IPAddress.Any;
-            _listener = new TcpListener(ipAddr, port);
+            if (!IPAddress.TryParse(ip, out var ipAddr))
+            {
+                ipAddr = IPAddress.Any;
+                Logger.Warn($"Failed to parse listening address {ip}, defaulting to any interface.");
+            }
 
+            _listener = new TcpListener(ipAddr, port);
             _tokenSource = new CancellationTokenSource();
 
             if (sync == null)
             {
-                Debug.WriteLine("No sync info specified, running in listen only mode");
+                Logger.Warn("No sync info specified, running in listen only mode");
                 Task.Run(() => EstabilishOutgoing(sync), _tokenSource.Token);
             }
 
             _listener.Start();
+            Logger.Info($"Listening on port {port} for incoming events");
             IsListening = true;
 
             using (_tokenSource.Token.Register(() => _listener.Stop()))
@@ -76,10 +140,15 @@ namespace emt_sdk.Events
                     while (true)
                     {
                         var client = _listener.AcceptTcpClient();
+                        Logger.Info($"Accepted connection from {client.Client.RemoteEndPoint}");
                         Task.Run(() => HandleConnection(client, _tokenSource.Token), _tokenSource.Token);
                     }
                 }
-                catch { } // We just eat the exception, everything is closing anyways
+                catch (SocketException e)
+                {
+                    Logger.Warn(e, "Exception during event manager shutdown");
+                    throw e;
+                }
                 finally
                 {
                     if (_listener.Server.IsBound) _listener.Stop();
@@ -88,6 +157,9 @@ namespace emt_sdk.Events
             }
         }
 
+        /// <summary>
+        /// Stops listening for new connections and closes all outgoing sockets
+        /// </summary>
         public void Stop()
         {
             _tokenSource.Cancel();
@@ -123,15 +195,13 @@ namespace emt_sdk.Events
             }
             catch (InvalidProtocolBufferException e)
             {
-                Debug.WriteLine("Invalid message received, ignoring.");
+                Logger.Error("Invalid event protobuf message received, closing connection", e);
             }
             catch (SocketException e)
             {
-                // TODO: Install nlog
                 // TODO: Test unexpected cases
                 // TODO: Test on linux
-                // TODO: Remove user counting
-                Debug.WriteLine(e);
+                Logger.Error("Socket error on event connection ", e);
             }
             finally
             {
