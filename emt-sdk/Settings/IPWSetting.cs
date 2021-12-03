@@ -34,7 +34,7 @@ namespace emt_sdk.Settings
         /// <summary>
         /// Currently active layout
         /// </summary>
-        public IPWOrientation Orientation { get; set; }
+        public IPWOrientation Orientation { get; set; } = IPWOrientation.Horizontal;
 
         /// <summary>
         /// Display transformations for individual displays
