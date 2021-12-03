@@ -32,5 +32,28 @@ namespace emt_sdk.Settings
             X = 1,
             Y = -1
         };
+
+        /// <summary>
+        /// Vertically aligns (sets the X coordinate to the same value) pairs of TopRight/BottomRight and TopLeft/BottomLeft. Always uses the top coordinates as source data.
+        /// </summary>
+        /// <returns></returns>
+        public SkewSetting AlignSides()
+        {
+            return new SkewSetting
+            {
+                TopLeft = TopLeft,
+                TopRight = TopRight,
+                BottomLeft = new Vector2
+                {
+                    X = TopLeft.X,
+                    Y = BottomLeft.Y
+                },
+                BottomRight = new Vector2
+                {
+                    X = TopRight.X,
+                    Y = BottomRight.Y
+                }
+            };
+        }
     }
 }
