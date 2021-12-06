@@ -385,3 +385,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# Doxygen generated files
+/docs/
