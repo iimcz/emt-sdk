@@ -11,19 +11,29 @@
         public enum VideoAspectRatioEnum 
         {
             /// <summary>
-            /// Fits video into the viewport, adding black bars
+            /// Fits video into the viewport, adding black bars - Fit larger side
             /// </summary>
             FitInside,
 
             /// <summary>
-            /// Fits the video into the viewport, cropping parts that don't fit
+            /// Fits the video into the viewport, cropping parts that don't fit - Fit smaller side
             /// </summary>
             FitOutside,
 
             /// <summary>
             /// Stretches the video across the entire viewport (distorts image)
             /// </summary>
-            Fill
+            Stretch
+        }
+
+        public class VideoEvent
+        {
+            /// <summary>
+            /// Point in time when the event should be raised in seconds
+            /// </summary>
+            public float Timestamp { get; set; }
+
+            public string EventName { get; set; }
         }
 
         /// <summary>
@@ -45,5 +55,12 @@
         /// Determines how the video content will be rescaled to fit the screen
         /// </summary>
         public VideoAspectRatioEnum AspectRatio { get; set; }
+
+        /// <summary>
+        /// Background color in hex, formatted as #RRGGBB (e.g. #A1FF12)
+        /// </summary>
+        public string BackgroundColor { get; set; }
+
+        public VideoEvent[] VideoEvents { get; set; }
     }
 }

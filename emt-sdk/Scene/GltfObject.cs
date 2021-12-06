@@ -8,21 +8,6 @@ namespace emt_sdk.Scene
     /// </summary>
     public class GltfObject
     {
-        /// <summary>
-        /// Types of 3D object animation
-        /// </summary>
-        public enum OrbitTypeEnum
-        { 
-            /// <summary>
-            /// Orbits the camera around the object
-            /// </summary>
-            RotateCamera, 
-
-            /// <summary>
-            /// Spins the object around its axis
-            /// </summary>
-            RotateObject 
-        }
 
         /// <summary>
         /// Defines how the user interacts with flags
@@ -52,9 +37,9 @@ namespace emt_sdk.Scene
             public string ObjectName { get; set; }
 
             /// <summary>
-            /// Absolute coordinates in model space
+            /// Offset coordinates in model space relative to <see cref="ObjectName"/> or scene root if it is <see langword="null"/>.
             /// </summary>
-            public Vector3 Position { get; set; } = new Vector3();
+            public Vector3 Offset { get; set; } = new Vector3();
         }
 
         /// <summary>
@@ -70,23 +55,47 @@ namespace emt_sdk.Scene
             /// <summary>
             /// Displayed text
             /// </summary>
+            // TODO: Add link to tmpro
             public string Text { get; set; }
 
             /// <summary>
-            /// Action to execute on flag activation, null if no action should be performed. Flags without actions also cannot be selected.
+            /// Action to execute on flag activation, <see langword="null"/> if no action should be performed.
             /// </summary>
-            public string Action { get; set; }
+            public string ActivatedAction { get; set; }
+
+            /// <summary>
+            /// Action to execute on flag selection, <see langword="null"/> if no action should be performed.
+            /// </summary>
+            public string SelectedAction { get; set; }
+
+            public string ForegroundColor { get; set; }
+            public string BackgroundColor { get; set; }
+            public string ŚtalkColor { get; set; }
+
+            // TODO: Background material adjustement
+
+            /// <summary>
+            /// Whether this flag can be selected. Value of <see langword="false"/> disables both <see cref="ActivatedAction"/> and <see cref="SelectedAction"/>.
+            /// </summary>
+            public bool CanSelect { get; set; }
         }
 
+        public class CameraAnimation { }
+
         /// <summary>
-        /// Camera orbit definition
+        /// Camera cylinder orbit definition
         /// </summary>
-        public class Orbit
+        public class OrbitAnimation : CameraAnimation
         {
             /// <summary>
             /// Origin point around which the camera rotates
             /// </summary>
             public GltfLocation Origin { get; set; }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public GltfLocation LookAt { get; set; }
 
             /// <summary>
             /// Distance of the camera from the object, radius of rotation path
@@ -109,20 +118,21 @@ namespace emt_sdk.Scene
         /// </summary>
         public string FileName { get; set; }
 
-        /// <summary>
-        /// Type of orbit used for animation
-        /// </summary>
-        public OrbitTypeEnum OrbitType { get; set; }
 
         /// <summary>
-        /// Camera orbit definition, only used when <see cref="OrbitType"/> is equal to <see cref="OrbitTypeEnum.RotateCamera"/>
+        /// Name of the skybox cubemap file, white if no file is specified
         /// </summary>
-        public Orbit CameraOrbit { get; set; }
+        public string Skybox { get; set; }
 
         /// <summary>
-        /// Time in seconds it takes to spin the object around once, only used when <see cref="OrbitType"/> is equal to <see cref="OrbitTypeEnum.RotateObject"/>
+        /// 
         /// </summary>
-        public float ObjectRevolutionTime { get; set; }
+        public string SkyboxTint { get; set; }
+
+        /// <summary>
+        /// </summary>
+        // TODO: Naming
+        public CameraAnimation CameraAnimationa { get; set; }
 
         public FlagInteractionTypeEnum FlagInteraction { get; set; } = FlagInteractionTypeEnum.Swipe;
 
