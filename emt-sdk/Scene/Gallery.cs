@@ -109,7 +109,7 @@ namespace emt_sdk.Scene
         /// <summary>
         /// How long should the delay between automatic scrolling steps in seconds. Value of 0 disables automatic scrolling.
         /// </summary>
-        public bool ScrollDelay { get; set; }
+        public float ScrollDelay { get; set; }
 
         /// <summary>
         /// How long the scroll animation itself should be in seconds (default is 0.3s)
