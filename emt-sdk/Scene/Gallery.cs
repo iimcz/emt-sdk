@@ -92,7 +92,12 @@ namespace emt_sdk.Scene
         /// <summary>
         /// Active layout for this gallery
         /// </summary>
-        public GalleryLayoutEnum Layout { get; set; }
+        public GalleryLayoutEnum LayoutType { get; set; }
+        
+        /// <summary>
+        /// Parameters of the specific layout in <see cref="LayoutType"/>
+        /// </summary>
+        public GalleryLayout Layout { get; set; }
 
         // TODO: Add to docs that all sizes are relative to the entire screen space (including multiple IPWs)
         /// <summary>
