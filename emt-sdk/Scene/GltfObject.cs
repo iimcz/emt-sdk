@@ -41,6 +41,11 @@ namespace emt_sdk.Scene
             /// </summary>
             public Vector3 Offset { get; set; } = new Vector3();
         }
+        
+        /// <summary>
+        /// Base interface for all animations
+        /// </summary>
+        public interface ICameraAnimation { }
 
         /// <summary>
         /// Description flag in model
@@ -70,7 +75,7 @@ namespace emt_sdk.Scene
 
             public string ForegroundColor { get; set; }
             public string BackgroundColor { get; set; }
-            public string ŚtalkColor { get; set; }
+            public string StalkColor { get; set; }
 
             // TODO: Background material adjustement
 
@@ -80,12 +85,10 @@ namespace emt_sdk.Scene
             public bool CanSelect { get; set; }
         }
 
-        public class CameraAnimation { }
-
         /// <summary>
         /// Camera cylinder orbit definition
         /// </summary>
-        public class OrbitAnimation : CameraAnimation
+        public class OrbitAnimation : ICameraAnimation
         {
             /// <summary>
             /// Origin point around which the camera rotates
@@ -125,14 +128,11 @@ namespace emt_sdk.Scene
         public string Skybox { get; set; }
 
         /// <summary>
-        /// 
+        /// Tint applied to the skybox, background color if no skybox is specified
         /// </summary>
         public string SkyboxTint { get; set; }
-
-        /// <summary>
-        /// </summary>
-        // TODO: Naming
-        public CameraAnimation CameraAnimationa { get; set; }
+        
+        public ICameraAnimation CameraAnimation { get; set; }
 
         public FlagInteractionTypeEnum FlagInteraction { get; set; } = FlagInteractionTypeEnum.Swipe;
 
