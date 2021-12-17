@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using emt_sdk.Extensions;
 using emt_sdk.Events;
 using System.Threading.Tasks;
+using emt_sdk.Generated.ScenePackage;
 
 namespace emt_sdk_poc
 {
@@ -23,7 +24,7 @@ namespace emt_sdk_poc
                     Console.WriteLine($"Loading: {pckg}");
                     var package = loader.LoadPackage(new StringReader(pckg.DescriptorJson), false);
                     Console.WriteLine($"Downloading package: {package.PackagePackage.Url}");
-                    package.DownloadFile(".");
+                    package.DownloadFile();
                     Console.WriteLine("Checksum ok");
                 }
             };
@@ -97,7 +98,8 @@ namespace emt_sdk_poc
 
         static async Task Main(string[] args)
         {
-            await Relay();
+            //await Relay();
+            ContentManager();
 
             Console.WriteLine("End of POC");
             Console.ReadLine();

@@ -26,6 +26,16 @@ namespace emt_sdk.ScenePackage
             }
         }
 
+        public Package LoadPackage(string packageDirectory, bool validate = true)
+        {
+            if (!Directory.Exists(packageDirectory)) throw new DirectoryNotFoundException();
+
+            var packageFile = Path.Combine(packageDirectory, "package.json");
+            if (!File.Exists(packageFile)) throw new FileLoadException();
+
+            using (var reader = File.OpenRead(packageFile)) return LoadPackage(reader, validate);
+            }
+
         public Package LoadPackage(TextReader reader, bool validate = true)
         {
             if (reader == null) throw new ArgumentNullException(nameof(reader));
