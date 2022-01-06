@@ -1,11 +1,16 @@
 ﻿using emt_sdk.Communication;
 using emt_sdk.ScenePackage;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using emt_sdk.Extensions;
 using emt_sdk.Events;
 using System.Threading.Tasks;
+using emt_sdk.Scene;
+using Naki3D.Common.Protocol;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace emt_sdk_poc
 {
@@ -58,6 +63,8 @@ namespace emt_sdk_poc
             {
                 Console.WriteLine(e.Gesture.Type);
             }
+            else if (e.DataCase == SensorMessage.DataOneofCase.UltrasonicDistance) Console.WriteLine(e.UltrasonicDistance.Distance);
+            else if (e.DataCase == SensorMessage.DataOneofCase.LightLevel) Console.WriteLine(e.LightLevel.Level);
         }
 
         static async Task Relay()
@@ -97,7 +104,23 @@ namespace emt_sdk_poc
 
         static async Task Main(string[] args)
         {
-            await Relay();
+            Task.Run(EventServer);
+            //await Relay();
+
+            while (true)
+            {
+                switch (Console.ReadKey().KeyChar.ToString())
+                {
+                    case "p":
+                        EventManager.Instance.ProjectorControl.PowerOn();
+                        break;
+                    case "s":
+                        EventManager.Instance.ProjectorControl.PowerOff();
+                        break;
+                }
+
+                Console.WriteLine("");
+            }
 
             Console.WriteLine("End of POC");
             Console.ReadLine();
