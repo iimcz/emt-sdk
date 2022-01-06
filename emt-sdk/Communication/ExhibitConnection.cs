@@ -34,6 +34,9 @@ namespace emt_sdk.Communication
 
         public bool IsConnected => _client.Connected;
         public bool Verified { get; private set; } = false;
+        
+        public VersionInfo ClientVersion { get; private set; }
+        public VersionInfo ServerVersion { get; private set; }
         public ConnectionStateEnum ConnectionState { get; private set; } = ConnectionStateEnum.Disconnected;
         public EncryptionInfo EncryptionInfo { get; private set; } = null;
         public Action<LoadPackage> LoadPackageHandler { get; set; }
@@ -65,6 +68,8 @@ namespace emt_sdk.Communication
 
         public void Connect()
         {
+            ServerVersion = null;
+            
             ConnectionState = ConnectionStateEnum.VersionCheck;
             CompareVersions();
             ConnectionState = ConnectionStateEnum.VerifyRequest;
@@ -117,11 +122,11 @@ namespace emt_sdk.Communication
         private void CompareVersions()
         {
             var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
-            var version = assemblyVersion.ToVersionInfo();
+            ClientVersion = assemblyVersion.ToVersionInfo();
 
-            version.WriteJsonTo(_stream);
-            var serverInfo = VersionInfo.Parser.ParseJson(_jsonReader.NextJsonObject());
-            if (!IsVersionCompatible(serverInfo)) throw new Exception();
+            ClientVersion.WriteJsonTo(_stream);
+            ServerVersion = VersionInfo.Parser.ParseJson(_jsonReader.NextJsonObject());
+            if (!IsVersionCompatible(ServerVersion)) throw new Exception();
         }
 
         private bool IsVersionCompatible(VersionInfo verInfo)
