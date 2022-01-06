@@ -40,5 +40,10 @@ namespace emt_sdk.Settings
         /// Display transformations for individual displays
         /// </summary>
         public List<DisplaySetting> Displays { get; set; } = new List<DisplaySetting>();
+
+        /// <summary>
+        /// Communication settings
+        /// </summary>
+        public CommunicationSettings Communication { get; set; } = new CommunicationSettings();
     }
 }
