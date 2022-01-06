@@ -11,6 +11,7 @@ using emt_sdk.Scene;
 using Naki3D.Common.Protocol;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using emt_sdk.Generated.ScenePackage;
 
 namespace emt_sdk_poc
 {
@@ -28,7 +29,7 @@ namespace emt_sdk_poc
                     Console.WriteLine($"Loading: {pckg}");
                     var package = loader.LoadPackage(new StringReader(pckg.DescriptorJson), false);
                     Console.WriteLine($"Downloading package: {package.PackagePackage.Url}");
-                    package.DownloadFile(".");
+                    package.DownloadFile();
                     Console.WriteLine("Checksum ok");
                 }
             };
@@ -58,13 +59,12 @@ namespace emt_sdk_poc
 
         private static void Instance_OnEventReceived(object sender, Naki3D.Common.Protocol.SensorMessage e)
         {
+            /*
             Console.WriteLine($"[{e.Timestamp}] ({e.SensorId}) - {e.DataCase}");
             if (e.DataCase == Naki3D.Common.Protocol.SensorMessage.DataOneofCase.Gesture)
             {
                 Console.WriteLine(e.Gesture.Type);
-            }
-            else if (e.DataCase == SensorMessage.DataOneofCase.UltrasonicDistance) Console.WriteLine(e.UltrasonicDistance.Distance);
-            else if (e.DataCase == SensorMessage.DataOneofCase.LightLevel) Console.WriteLine(e.LightLevel.Level);
+            }*/
         }
 
         static async Task Relay()
