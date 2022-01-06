@@ -3,11 +3,13 @@ using emt_sdk.Settings;
 using Google.Protobuf;
 using Naki3D.Common.Protocol;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using emt_sdk.Communication;
 
 namespace emt_sdk.Events
 {
@@ -43,6 +45,8 @@ namespace emt_sdk.Events
             }
         }
 
+        public ProjectorControl ProjectorControl { get; private set; }
+
         /// <summary>
         /// Handler for receicing sensor events
         /// </summary>
@@ -69,6 +73,13 @@ namespace emt_sdk.Events
 
         private readonly List<TcpClient> _outgoingClients = new List<TcpClient>();
         private readonly List<NetworkStream> _outgoingStreams = new List<NetworkStream>();
+
+        private readonly List<NetworkStream> _localIncoming = new List<NetworkStream>();
+
+        public EventManager()
+        {
+            ProjectorControl = new ProjectorControl(_localIncoming);
+        }
 
         /// <summary>
         /// Broadcasts an event to all connected devices and relays (if connected)
@@ -106,7 +117,7 @@ namespace emt_sdk.Events
         /// Starts listening for incoming connections and connects to other available devices.
         /// </summary>
         /// <param name="sync">Sync data used for connecting to other devices</param>
-        /// <param name="ip">Listening IP asdress</param>
+        /// <param name="ip">Listening IP address</param>
         /// <param name="port">Listening and target port for both incoming and outgoing sockets</param>
         /// <exception cref="SocketException">Throw on any socket related problems</exception>
         public void Start(Sync sync, string ip = null, int port = SENSOR_MESSAGE_PORT)
@@ -119,6 +130,10 @@ namespace emt_sdk.Events
                 ipAddr = IPAddress.Any;
                 Logger.Warn($"Failed to parse listening address {ip}, defaulting to any interface.");
             }
+            
+            _outgoingClients.Clear();
+            _outgoingStreams.Clear();
+            lock (_localIncoming) _localIncoming.Clear();
 
             _listener = new TcpListener(ipAddr, port);
             _tokenSource = new CancellationTokenSource();
@@ -183,6 +198,13 @@ namespace emt_sdk.Events
             Interlocked.Increment(ref _listeners);
             var stream = client.GetStream();
 
+            IPEndPoint endPoint = client.Client.LocalEndPoint as IPEndPoint;
+            var address = endPoint.Address.GetAddressBytes();
+            if (true /* some custom address filtering here for 2nd interface*/)
+            {
+                lock (_localIncoming) _localIncoming.Add(stream);
+            }
+
             try
             {
                 while (!token.IsCancellationRequested)
@@ -206,6 +228,7 @@ namespace emt_sdk.Events
             finally
             {
                 Interlocked.Decrement(ref _listeners);
+                lock (_localIncoming) _localIncoming.Remove(stream);
                 if (client.Connected) client.Close();
             }
         }
