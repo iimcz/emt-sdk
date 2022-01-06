@@ -10,7 +10,7 @@
         /// <summary>
         /// Port of the Content Manager server
         /// </summary>
-        public int ContentPort { get; set; }
+        public int ContentPort { get; set; } = 3917;
 
         /// <summary>
         /// IP used by <see cref="Events.EventManager"/> for listening for incoming sensor events
@@ -20,6 +20,6 @@
         /// <summary>
         /// Port used by <see cref="Events.EventManager"/> for listening for incoming sensor events
         /// </summary>
-        public int SensorListenPort { get; set; }
+        public int SensorListenPort { get; set; } = 5000;
     }
 }
