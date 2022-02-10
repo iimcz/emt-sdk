@@ -80,7 +80,10 @@ namespace emt_sdk.Generated.ScenePackage
         /// <returns>Package archive filename</returns>
         public string ArchiveFileName
         {
-            get {
+            get
+            {
+                return Package.Checksum + ".zip";
+                
                 var url = Package.Url;
                 var queryDictionary = System.Web.HttpUtility.ParseQueryString(url.Query);
                 return queryDictionary["packageName"];
