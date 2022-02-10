@@ -85,7 +85,9 @@ namespace emt_sdk.ScenePackage
             {
                 try
                 {
-                    packages.Add(LoadPackage(package, validate));
+                    var desc = LoadPackage(package, validate);
+                    desc.Package.Checksum = Path.GetFileName(package);
+                    packages.Add(desc);
                 }
                 catch
                 {

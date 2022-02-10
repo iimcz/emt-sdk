@@ -104,7 +104,9 @@ namespace emt_sdk_poc
 
         static async Task Main(string[] args)
         {
-            Task.Run(ContentManager);
+            var loader = new PackageLoader(null);
+            var packages = loader.EnumeratePackages(false);
+            //Task.Run(ContentManager);
 
             //Task.Run(EventServer);
             //await Relay();

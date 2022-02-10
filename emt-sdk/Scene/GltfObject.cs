@@ -34,6 +34,7 @@ namespace emt_sdk.Scene
             /// <summary>
             /// Name of a GLTF object to be used as a poistion. If null <see cref="Position"/> is used instead.
             /// </summary>
+            // TODO: Have a list of names that are reserved in docs
             public string ObjectName { get; set; }
 
             /// <summary>
