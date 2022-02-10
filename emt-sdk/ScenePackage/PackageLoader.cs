@@ -10,13 +10,19 @@ namespace emt_sdk.ScenePackage
     public class PackageLoader
     {
         private const string SCHEMA_PATH = @"../emt-common/json/package-schema.json";
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
         private readonly JsonSerializer _jsonSerializer = JsonSerializer.Create(Converter.Settings);
         private readonly JSchema _schema;
 
         public PackageLoader(string schema = SCHEMA_PATH)
         {
-            if (schema == null) throw new ArgumentNullException(nameof(schema));
+            if (schema == null)
+            {
+                Logger.Warn("Creating PackageLoader without any schema!");
+                return;
+            }
+
             if (!File.Exists(schema)) throw new FileNotFoundException();
 
             using (StreamReader file = File.OpenText(schema))
@@ -26,7 +32,7 @@ namespace emt_sdk.ScenePackage
             }
         }
 
-        public Package LoadPackage(string packageDirectory, bool validate = true)
+        public PackageDescriptor LoadPackage(string packageDirectory, bool validate = true)
         {
             if (!Directory.Exists(packageDirectory)) throw new DirectoryNotFoundException();
 
@@ -34,16 +40,16 @@ namespace emt_sdk.ScenePackage
             if (!File.Exists(packageFile)) throw new FileLoadException();
 
             using (var reader = File.OpenRead(packageFile)) return LoadPackage(reader, validate);
-            }
+        }
 
-        public Package LoadPackage(TextReader reader, bool validate = true)
+        public PackageDescriptor LoadPackage(TextReader reader, bool validate = true)
         {
             if (reader == null) throw new ArgumentNullException(nameof(reader));
             
             using (var jsonTextReader = new JsonTextReader(reader))
             using (var jsonValidatingReader = new JSchemaValidatingReader(jsonTextReader))
             {
-                Package package;
+                PackageDescriptor package;
 
                 if (validate)
                 {
@@ -51,12 +57,12 @@ namespace emt_sdk.ScenePackage
 
                     jsonValidatingReader.Schema = _schema;
                     jsonValidatingReader.ValidationEventHandler += (o, a) => messages.Add(a.Message);
-                    package = _jsonSerializer.Deserialize<Package>(jsonValidatingReader);
+                    package = _jsonSerializer.Deserialize<PackageDescriptor>(jsonValidatingReader);
                     if (messages.Count != 0) throw new InvalidDataException();
                 }
                 else
                 {
-                    package = _jsonSerializer.Deserialize<Package>(jsonTextReader);
+                    package = _jsonSerializer.Deserialize<PackageDescriptor>(jsonTextReader);
                 }
 
                 if (package == null) throw new InvalidDataException();
@@ -64,12 +70,31 @@ namespace emt_sdk.ScenePackage
             }
         }
 
-        public Package LoadPackage(Stream packageStream, bool validate = true)
+        public PackageDescriptor LoadPackage(Stream packageStream, bool validate = true)
         {
             if (packageStream == null) throw new ArgumentNullException(nameof(packageStream));
             if (!packageStream.CanRead) throw new IOException();
 
             using (var sr = new StreamReader(packageStream)) return LoadPackage(sr, validate);
+        }
+
+        public List<PackageDescriptor> EnumeratePackages(bool validate = true)
+        {
+            var packages = new List<PackageDescriptor>();
+            foreach (var package in Directory.EnumerateDirectories(PackageDescriptor.PackageStore))
+            {
+                try
+                {
+                    packages.Add(LoadPackage(package, validate));
+                }
+                catch
+                {
+                    Logger.Warn($"Malformed or invaid package detected in '{package}', ignoring");
+                    // ignored
+                }
+            }
+
+            return packages;
         }
     }
 }

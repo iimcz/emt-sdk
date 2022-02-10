@@ -11,16 +11,16 @@ using emt_sdk.ScenePackage;
 namespace emt_sdk.Generated.ScenePackage
 {
     /// <summary>
-    /// Implementation of <see cref="Package"/> logic.
+    /// Implementation of <see cref="PackageDescriptor"/> logic.
     /// </summary>
-    public partial class Package
+    public partial class PackageDescriptor
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         
         public static readonly string DefaultPackageStore;
         public static readonly string PackageStore;
 
-        static Package()
+        static PackageDescriptor()
         {
             DefaultPackageStore = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cache", "emt");
             PackageStore = Environment.GetEnvironmentVariable("EMT_PATH") ?? DefaultPackageStore;
@@ -33,9 +33,9 @@ namespace emt_sdk.Generated.ScenePackage
         /// </summary>
         public void DownloadFile()
         {
-            using (var client = new WebClient()) client.DownloadFile(PackagePackage.Url, ArchivePath);
+            using (var client = new WebClient()) client.DownloadFile(Package.Url, ArchivePath);
 
-            if (!VerifyChecksum(PackagePackage.Checksum))
+            if (!VerifyChecksum(Package.Checksum))
             {
                 Logger.Error($"Checksum verification failed for package '{ArchiveFileName}', aborting");
                 File.Delete(ArchivePath);
@@ -49,7 +49,7 @@ namespace emt_sdk.Generated.ScenePackage
             using (var stream = new FileStream(ArchivePath, FileMode.Open))
             using (var zip = new ZipArchive(stream))
             {
-                zip.ExtractToDirectory(ArchivePath);
+                zip.ExtractToDirectory(PackageDirectory);
             }
         }
 
@@ -81,7 +81,7 @@ namespace emt_sdk.Generated.ScenePackage
         public string ArchiveFileName
         {
             get {
-                var url = PackagePackage.Url;
+                var url = Package.Url;
                 var queryDictionary = System.Web.HttpUtility.ParseQueryString(url.Query);
                 return queryDictionary["packageName"];
             }
@@ -92,7 +92,12 @@ namespace emt_sdk.Generated.ScenePackage
         /// <summary>
         /// Gets the location of the extracted package
         /// </summary>
-        public string PackageDirectory => Path.GetFileNameWithoutExtension(ArchivePath);
+        public string PackageDirectory => Path.Combine(PackageStore, Path.GetFileNameWithoutExtension(ArchivePath));
+
+        /// <summary>
+        /// Gets the location of package resources (video, models, images, etc...)
+        /// </summary>
+        public string DataRoot => Path.Combine(PackageDirectory, "dataroot");
 
         /// <summary>
         /// Checks whether a package is downloaded
@@ -115,32 +120,11 @@ namespace emt_sdk.Generated.ScenePackage
         /// <returns>Launched process</returns>
         public Process Run()
         {
-            if (Parameters.DisplayType != DisplayType.Scene) throw new NotSupportedException();
+            if (Parameters.DisplayType != "scene") throw new NotSupportedException();
             return Process.Start(new ProcessStartInfo
             {
-                FileName = Path.Combine(PackageDirectory, "dataroot", "scene.x86_64")
+                FileName = Path.Combine(DataRoot, "scene.x86_64")
             });
-        }
-
-        public static List<Package> EnumeratePackages()
-        {
-            var loader = new PackageLoader();
-            var packages = new List<Package>();
-
-            foreach (var package in Directory.EnumerateDirectories(PackageStore))
-            {
-                try
-                {
-                    packages.Add(loader.LoadPackage(package));
-                }
-                catch
-                {
-                    Logger.Warn($"Malformed or invaid package detected in '{package}', ignoring");
-                    // ignored
-                }
-            }
-
-            return packages;
         }
     }
 }

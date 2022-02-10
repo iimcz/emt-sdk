@@ -28,6 +28,11 @@ namespace emt_sdk.Settings
         /// </summary>
         public CommunicationSettings Communication { get; set; }
 
+        /// <summary>
+        /// Name of default package loaded at startup
+        /// </summary>
+        public string StartupPackage { get; set; }
+
         public void Save()
         {
             Directory.CreateDirectory(ConfigDirectory);

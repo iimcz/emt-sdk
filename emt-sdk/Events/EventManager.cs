@@ -122,6 +122,12 @@ namespace emt_sdk.Events
         /// <exception cref="SocketException">Throw on any socket related problems</exception>
         public void Start(Sync sync, string ip = null, int port = SENSOR_MESSAGE_PORT)
         {
+            if (_listener != null && _listener.Server.IsBound)
+            {
+                Logger.Info("Attempted to restart EventManager even though it's already running, ignoring.");
+                return;
+            }
+
             _sync = sync;
             ip = ip ?? string.Empty;
 

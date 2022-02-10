@@ -28,7 +28,7 @@ namespace emt_sdk_poc
                     var loader = new PackageLoader("package-schema.json");
                     Console.WriteLine($"Loading: {pckg}");
                     var package = loader.LoadPackage(new StringReader(pckg.DescriptorJson), false);
-                    Console.WriteLine($"Downloading package: {package.PackagePackage.Url}");
+                    Console.WriteLine($"Downloading package: {package.Package.Url}");
                     package.DownloadFile();
                     Console.WriteLine("Checksum ok");
                 }
@@ -104,9 +104,12 @@ namespace emt_sdk_poc
 
         static async Task Main(string[] args)
         {
-            Task.Run(EventServer);
+            Task.Run(ContentManager);
+
+            //Task.Run(EventServer);
             //await Relay();
 
+            /*
             while (true)
             {
                 switch (Console.ReadKey().KeyChar.ToString())
@@ -121,6 +124,7 @@ namespace emt_sdk_poc
 
                 Console.WriteLine("");
             }
+            */
 
             Console.WriteLine("End of POC");
             Console.ReadLine();

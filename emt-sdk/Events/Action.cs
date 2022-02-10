@@ -19,13 +19,13 @@ namespace emt_sdk.Generated.ScenePackage
                 
             switch (Type)
             {
-                case InputType.Event:
+                case TypeEnum.Event:
                     return message.DataCase == SensorMessage.DataOneofCase.Event && 
                            Mapping.EventName == message.Event.Name;
-                case InputType.Gesture:
+                case TypeEnum.Gesture:
                     return message.DataCase == SensorMessage.DataOneofCase.Gesture &&
                            Mapping.GestureName == message.Gesture.Type.ToString();
-                case InputType.Value:
+                case TypeEnum.Value:
                     return CompareValue(message);
                 default:
                     throw new NotImplementedException();
