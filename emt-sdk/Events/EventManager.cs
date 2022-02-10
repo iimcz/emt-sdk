@@ -210,6 +210,9 @@ namespace emt_sdk.Events
             {
                 lock (_localIncoming) _localIncoming.Add(stream);
             }
+            
+            // Attempt to start projector
+            ProjectorControl.PowerOn();
 
             try
             {
