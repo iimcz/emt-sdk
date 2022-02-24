@@ -32,11 +32,11 @@ namespace emt_sdk.Generated.ScenePackage
 
     public partial class Action
     {
+        [JsonProperty("effect")]
+        public string Effect { get; set; }
+
         [JsonProperty("mapping")]
         public Mapping Mapping { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
 
         [JsonProperty("type")]
         public TypeEnum Type { get; set; }
@@ -50,9 +50,6 @@ namespace emt_sdk.Generated.ScenePackage
         [JsonProperty("source")]
         public string Source { get; set; }
 
-        [JsonProperty("gestureName", NullValueHandling = NullValueHandling.Ignore)]
-        public string GestureName { get; set; }
-
         [JsonProperty("condition", NullValueHandling = NullValueHandling.Ignore)]
         public Condition? Condition { get; set; }
 
@@ -61,6 +58,18 @@ namespace emt_sdk.Generated.ScenePackage
 
         [JsonProperty("thresholdType", NullValueHandling = NullValueHandling.Ignore)]
         public ThresholdType? ThresholdType { get; set; }
+
+        [JsonProperty("inMax", NullValueHandling = NullValueHandling.Ignore)]
+        public double? InMax { get; set; }
+
+        [JsonProperty("inMin", NullValueHandling = NullValueHandling.Ignore)]
+        public double? InMin { get; set; }
+
+        [JsonProperty("outMax", NullValueHandling = NullValueHandling.Ignore)]
+        public double? OutMax { get; set; }
+
+        [JsonProperty("outMin", NullValueHandling = NullValueHandling.Ignore)]
+        public double? OutMin { get; set; }
     }
 
     public partial class Metadata
@@ -68,11 +77,17 @@ namespace emt_sdk.Generated.ScenePackage
         [JsonProperty("author")]
         public string Author { get; set; }
 
+        [JsonProperty("description", NullValueHandling = NullValueHandling.Ignore)]
+        public string Description { get; set; }
+
         [JsonProperty("exposition")]
         public string Exposition { get; set; }
 
         [JsonProperty("other", NullValueHandling = NullValueHandling.Ignore)]
         public List<Other> Other { get; set; }
+
+        [JsonProperty("packageName", NullValueHandling = NullValueHandling.Ignore)]
+        public string PackageName { get; set; }
     }
 
     public partial class Other
@@ -245,14 +260,14 @@ namespace emt_sdk.Generated.ScenePackage
 
     public partial class GalleryImage
     {
-        [JsonProperty("activatedAction", NullValueHandling = NullValueHandling.Ignore)]
-        public string ActivatedAction { get; set; }
+        [JsonProperty("activatedEvent", NullValueHandling = NullValueHandling.Ignore)]
+        public string ActivatedEvent { get; set; }
 
         [JsonProperty("fileName", NullValueHandling = NullValueHandling.Ignore)]
         public string FileName { get; set; }
 
-        [JsonProperty("selectedAction", NullValueHandling = NullValueHandling.Ignore)]
-        public string SelectedAction { get; set; }
+        [JsonProperty("selectedEvent", NullValueHandling = NullValueHandling.Ignore)]
+        public string SelectedEvent { get; set; }
     }
 
     public partial class Vector2
@@ -310,7 +325,7 @@ namespace emt_sdk.Generated.ScenePackage
 
     public enum ThresholdType { Float, Integer };
 
-    public enum TypeEnum { Event, Gesture, GestureDrag, Value, ValueTrigger };
+    public enum TypeEnum { Event, Value, ValueTrigger };
 
     public enum AspectRatio { FitInside, FitOutside, Stretch };
 
@@ -446,10 +461,6 @@ namespace emt_sdk.Generated.ScenePackage
             {
                 case "event":
                     return TypeEnum.Event;
-                case "gesture":
-                    return TypeEnum.Gesture;
-                case "gestureDrag":
-                    return TypeEnum.GestureDrag;
                 case "value":
                     return TypeEnum.Value;
                 case "valueTrigger":
@@ -470,12 +481,6 @@ namespace emt_sdk.Generated.ScenePackage
             {
                 case TypeEnum.Event:
                     serializer.Serialize(writer, "event");
-                    return;
-                case TypeEnum.Gesture:
-                    serializer.Serialize(writer, "gesture");
-                    return;
-                case TypeEnum.GestureDrag:
-                    serializer.Serialize(writer, "gestureDrag");
                     return;
                 case TypeEnum.Value:
                     serializer.Serialize(writer, "value");

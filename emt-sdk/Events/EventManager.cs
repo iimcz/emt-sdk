@@ -5,11 +5,13 @@ using Naki3D.Common.Protocol;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using emt_sdk.Communication;
+using Action = emt_sdk.Generated.ScenePackage.Action;
 
 namespace emt_sdk.Events
 {
@@ -19,7 +21,7 @@ namespace emt_sdk.Events
     public class EventManager
     {
         /// <summary>
-        /// Default event listening port and also target port for otehr devices
+        /// Default event listening port and also target port for other devices
         /// </summary>
         public const int SENSOR_MESSAGE_PORT = 5000;
 
@@ -37,27 +39,33 @@ namespace emt_sdk.Events
         /// <summary>
         /// Gets the amount of currently connected listeners
         /// </summary>
-        public int Listeners
-        {
-            get
-            {
-                return _listeners;
-            }
-        }
+        public int Listeners => _listeners;
 
         public ProjectorControl ProjectorControl { get; private set; }
 
+        public List<Action> Actions { get; } = new List<Action>();
+
         /// <summary>
-        /// Handler for receicing sensor events
+        /// Handler for receiving sensor events
         /// </summary>
         /// <param name="sender">Sender of event, <see cref="EventManager"/> in most cases</param>
         /// <param name="e">Received message</param>
         public delegate void SensorMessageHandler(object sender, SensorMessage e);
+        
+        /// <summary>
+        /// Handler for executing effects
+        /// </summary>
+        public delegate void EffectHandler(object sender, EffectCall e);
 
         /// <summary>
         /// Called whenever an event is received either locally, from other device or from a relay
         /// </summary>
         public event SensorMessageHandler OnEventReceived;
+        
+        /// <summary>
+        /// Called whenever an effect is executed
+        /// </summary>
+        public event EffectHandler OnEffectCalled;
 
         /// <summary>
         /// Token for closing all socket connections, may be closed after receiving one more event per socket
@@ -221,7 +229,18 @@ namespace emt_sdk.Events
                     // TODO: that read could use that cancellation token for sure...
                     var sensorEvent = SensorMessage.Parser.ParseDelimitedFrom(stream);
                     if (sensorEvent.DataCase == SensorMessage.DataOneofCase.None) continue;
+                    
                     OnEventReceived?.Invoke(this, sensorEvent);
+                    
+                    var raisedEffects = Actions
+                        .Where(a => a.ShouldExecute(sensorEvent))
+                        .Select(a => new EffectCall
+                        {
+                            Name = a.Effect,
+                            Value = a.MapValue(sensorEvent)
+                        });
+
+                    foreach (var raisedEffect in raisedEffects) OnEffectCalled?.Invoke(this, raisedEffect);
                 }
             }
             catch (InvalidProtocolBufferException e)

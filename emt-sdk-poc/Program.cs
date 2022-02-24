@@ -12,6 +12,7 @@ using Naki3D.Common.Protocol;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using emt_sdk.Generated.ScenePackage;
+using Action = emt_sdk.Generated.ScenePackage.Action;
 
 namespace emt_sdk_poc
 {
@@ -51,20 +52,75 @@ namespace emt_sdk_poc
         {
             Console.WriteLine("Starting server on port 5000");
             EventManager.Instance.OnEventReceived += Instance_OnEventReceived;
-            EventManager.Instance.Start(new emt_sdk.Generated.ScenePackage.Sync
+            EventManager.Instance.OnEffectCalled += (sender, call) =>
             {
-                Elements = new System.Collections.Generic.List<emt_sdk.Generated.ScenePackage.Element>()
+                Console.WriteLine($"[CALL] {call.Name}: {call.Value?.ToString() ?? "void"}");
+            };
+            
+            EventManager.Instance.Actions.Add(new Action
+            {
+                Effect = "test",
+                Type = TypeEnum.Event,
+                Mapping = new Mapping
+                {
+                    Source = "1",
+                    EventName = "GestureSwipeDown"
+                }
+            });
+            
+            EventManager.Instance.Actions.Add(new Action
+            {
+                Effect = "moveStart",
+                Type = TypeEnum.ValueTrigger,
+                Mapping = new Mapping
+                {
+                    Source = "atom_1_pir_1",
+                    Condition = Condition.Equals,
+                    ThresholdType = ThresholdType.Integer,
+                    Threshold = ((int)PirMovementEvent.MovementStarted).ToString()
+                }
+            });
+            
+            EventManager.Instance.Actions.Add(new Action
+            {
+                Effect = "moveAny",
+                Type = TypeEnum.ValueTrigger,
+                Mapping = new Mapping
+                {
+                    Source = "atom_1_pir_1",
+                    Condition = Condition.AboveOrEquals,
+                    ThresholdType = ThresholdType.Integer,
+                    Threshold = "0"
+                }
+            });
+            
+            EventManager.Instance.Actions.Add(new Action
+            {
+                Effect = "distance",
+                Type = TypeEnum.Value,
+                Mapping = new Mapping
+                {
+                    Source = "raspi-1-ultrasonic-1",
+                    InMin = 0,
+                    InMax = 60,
+                    OutMin = 0,
+                    OutMax = 1,
+                }
+            });
+            
+            EventManager.Instance.Start(new Sync
+            {
+                Elements = new List<Element>()
             });
         }
 
         private static void Instance_OnEventReceived(object sender, Naki3D.Common.Protocol.SensorMessage e)
         {
-            /*
             Console.WriteLine($"[{e.Timestamp}] ({e.SensorId}) - {e.DataCase}");
-            if (e.DataCase == Naki3D.Common.Protocol.SensorMessage.DataOneofCase.Gesture)
+            if (e.DataCase == SensorMessage.DataOneofCase.Gesture)
             {
                 Console.WriteLine(e.Gesture.Type);
-            }*/
+            }
         }
 
         static async Task Relay()
@@ -104,11 +160,11 @@ namespace emt_sdk_poc
 
         static async Task Main(string[] args)
         {
-            var loader = new PackageLoader(null);
-            var packages = loader.EnumeratePackages(false);
+            //var loader = new PackageLoader(null);
+            //var packages = loader.EnumeratePackages(false);
             //Task.Run(ContentManager);
 
-            //Task.Run(EventServer);
+            Task.Run(EventServer);
             //await Relay();
 
             /*

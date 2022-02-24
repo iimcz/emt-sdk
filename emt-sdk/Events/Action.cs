@@ -6,10 +6,20 @@ namespace emt_sdk.Generated.ScenePackage
 {
     public partial class Action
     {
-        public void Execute()
+        public double? MapValue(SensorMessage message)
         {
-            
-            // TODO: Something based on name
+            if (!ShouldExecute(message)) return null;
+            if (Type != TypeEnum.Value) return null;
+
+            var value = FloatValue(message) ?? IntValue(message) ?? throw new NotImplementedException();
+            var clamped = Clamp(value, Mapping.InMin ?? double.MinValue, Mapping.InMax ?? double.MaxValue);
+
+            return Map(
+                clamped,
+                Mapping.InMin ?? double.MinValue,
+                Mapping.InMax ?? double.MaxValue,
+                Mapping.OutMin ?? double.MinValue,
+                Mapping.OutMax ?? double.MaxValue);
         }
         
         public bool ShouldExecute(SensorMessage message)
@@ -20,12 +30,23 @@ namespace emt_sdk.Generated.ScenePackage
             switch (Type)
             {
                 case TypeEnum.Event:
-                    return message.DataCase == SensorMessage.DataOneofCase.Event && 
-                           Mapping.EventName == message.Event.Name;
-                case TypeEnum.Gesture:
-                    return message.DataCase == SensorMessage.DataOneofCase.Gesture &&
-                           Mapping.GestureName == message.Gesture.Type.ToString();
+                    string eventName;
+                    switch (message.DataCase)
+                    {
+                        case SensorMessage.DataOneofCase.Event:
+                            eventName = message.Event.Name;
+                            break;
+                        case SensorMessage.DataOneofCase.Gesture:
+                            eventName = message.Gesture.Type.ToString();
+                            break;
+                        default:
+                            return false;
+                    }
+                    
+                    return string.Equals(Mapping.EventName, eventName, StringComparison.CurrentCultureIgnoreCase);
                 case TypeEnum.Value:
+                    return true;
+                case TypeEnum.ValueTrigger:
                     return CompareValue(message);
                 default:
                     throw new NotImplementedException();
@@ -54,17 +75,16 @@ namespace emt_sdk.Generated.ScenePackage
 
         private bool CompareValue(SensorMessage message)
         {
-            if (!Enum.TryParse<SensorMessage.DataOneofCase>(Mapping.Source, out var type)) throw new NotSupportedException();
-            if (message.DataCase != type || !Mapping.Condition.HasValue) return false;
+            if (!Mapping.Condition.HasValue) return false;
 
-            switch (Mapping.Threshold) // TODO: REGENERATE SCHEMA AND REPLACE
+            switch (Mapping.ThresholdType)
             {
-                case "integer":
-                    var iValue = IntValue(message);
+                case ThresholdType.Integer:
+                    var iValue = IntValue(message) ?? throw new NotImplementedException();
                     var iThreshold = int.Parse(Mapping.Threshold);
                     return _intComparisons[Mapping.Condition.Value](iValue, iThreshold);
-                case "float":
-                    var fValue = FloatValue(message);
+                case ThresholdType.Float:
+                    var fValue = FloatValue(message) ?? throw new NotImplementedException();
                     var fThreshold = float.Parse(Mapping.Threshold); 
                     return _floatComparisons[Mapping.Condition.Value](fValue, fThreshold);
                 default:
@@ -72,26 +92,40 @@ namespace emt_sdk.Generated.ScenePackage
             }
         }
 
-        private float FloatValue(SensorMessage message)
+        private float? FloatValue(SensorMessage message)
         {
             switch (message.DataCase)
             {
                 case SensorMessage.DataOneofCase.UltrasonicDistance:
                     return message.UltrasonicDistance.Distance;
+                case SensorMessage.DataOneofCase.LightLevel:
+                    return message.LightLevel.Level;
                 default:
-                    throw new NotImplementedException();
+                    return null;
             }
         }
 
-        private int IntValue(SensorMessage message)
+        private int? IntValue(SensorMessage message)
         {
             switch (message.DataCase)
             {
-                case SensorMessage.DataOneofCase.LightLevel:
-                    return (int) message.LightLevel.Level; // TODO: Maybe float?
+                case SensorMessage.DataOneofCase.PirMovement:
+                    return (int) message.PirMovement.Event;
                 default:
-                    throw new NotImplementedException();
+                    return null;
             }
+        }
+        
+        private double Map(double x, double inMin, double inMax, double outMin, double outMax) {
+            return (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+        }
+        
+        private static T Clamp<T>(T val, T min, T max) where T : IComparable<T>
+        {
+            if (val.CompareTo(min) < 0) return min;
+            if (val.CompareTo(max) > 0) return max;
+            
+            return val;
         }
     }
 }
