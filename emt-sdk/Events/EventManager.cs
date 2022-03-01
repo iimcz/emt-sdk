@@ -191,7 +191,7 @@ namespace emt_sdk.Events
         /// </summary>
         public void Stop()
         {
-            _tokenSource.Cancel();
+            _tokenSource?.Cancel();
             foreach (var client in _outgoingClients) client.Close();
         }
 

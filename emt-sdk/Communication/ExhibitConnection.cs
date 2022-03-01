@@ -22,7 +22,8 @@ namespace emt_sdk.Communication
         VerifyWait,
         Verified,
         DescriptorSent,
-        PackageInfoReceived
+        PackageInfoReceived,
+        VerificationDenied
     }
 
     public class ExhibitConnection : IDisposable
@@ -178,7 +179,15 @@ namespace emt_sdk.Communication
                 }
             }
 
-            if (!Verified) throw new Exception("Connection not verified");
+            if (!Verified)
+            {
+                Logger.Warn("Verification denied, closing connection without retry");
+                
+                ConnectionState = ConnectionStateEnum.VerificationDenied;
+                _client.Close();
+                _timeoutTimer.Stop();
+                _reconnectTimer.Stop();
+            }
         }
 
         private void RequestConnection()
@@ -275,6 +284,9 @@ namespace emt_sdk.Communication
         public void Dispose()
         {
             _client?.Dispose();
+            
+            _timeoutTimer.Stop();
+            _reconnectTimer.Stop();
         }
     }
 }
