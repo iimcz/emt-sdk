@@ -62,8 +62,9 @@ namespace emt_sdk.Communication
 
             _id = id ?? Dns.GetHostName();
             _descriptor = descriptor ?? throw new ArgumentNullException(nameof(descriptor));
-            
-            _target = new IPEndPoint(IPAddress.Parse(settings.ContentHostname), settings.ContentPort);
+
+            var entry = Dns.GetHostEntry(settings.ContentHostname);
+            _target = new IPEndPoint(entry.AddressList[0], settings.ContentPort);
 
             _timeoutTimer = new Timer(TIMEOUT_INTERVAL);
             _timeoutTimer.Elapsed += TimeoutElapsed;

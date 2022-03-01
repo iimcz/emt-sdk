@@ -23,7 +23,7 @@ namespace emt_sdk_poc
         {
             var settings = new CommunicationSettings
             {
-                ContentHostname = "127.0.0.1",
+                ContentHostname = "localhost",
                 ContentPort = 3917
             };
             
