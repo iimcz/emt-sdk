@@ -12,17 +12,30 @@ using Naki3D.Common.Protocol;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using emt_sdk.Generated.ScenePackage;
+using emt_sdk.Settings;
 using Action = emt_sdk.Generated.ScenePackage.Action;
 
 namespace emt_sdk_poc
 {
     class Program
     {
-        static void ContentManager()
+        static async Task ContentManager()
         {
-            var client = new TcpClient("127.0.0.1", 3917);
+            var settings = new CommunicationSettings
+            {
+                ContentHostname = "127.0.0.1",
+                ContentPort = 3917
+            };
+            
+            var descriptor = new DeviceDescriptor
+            {
+                PerformanceCap = PerformanceCap.Fast,
+                Type = DeviceType.Ipw
+            };
+            descriptor.LocalSensors.Add(SensorType.Gesture);
+            
             Console.WriteLine("Socket connected");
-            var connection = new ExhibitConnection(client)
+            var connection = new ExhibitConnection(settings, descriptor)
             {
                 ClearPackageHandler = pckg => { Console.WriteLine($"Clearing: {pckg}"); },
                 LoadPackageHandler = pckg => {
@@ -37,14 +50,7 @@ namespace emt_sdk_poc
 
             connection.Connect();
             Console.WriteLine("Connection verified");
-            if (!connection.Verified) throw new Exception();
-            var descriptor = new Naki3D.Common.Protocol.DeviceDescriptor
-            {
-                PerformanceCap = Naki3D.Common.Protocol.PerformanceCap.Fast,
-                Type = Naki3D.Common.Protocol.DeviceType.Ipw
-            };
-            descriptor.LocalSensors.Add(Naki3D.Common.Protocol.SensorType.Gesture);
-            connection.SendDescriptor(descriptor);
+            while (!connection.Verified) await Task.Delay(500);
             Console.WriteLine("Crypto info received, waiting for package");
         }
 
@@ -114,7 +120,7 @@ namespace emt_sdk_poc
             });
         }
 
-        private static void Instance_OnEventReceived(object sender, Naki3D.Common.Protocol.SensorMessage e)
+        private static void Instance_OnEventReceived(object sender, SensorMessage e)
         {
             Console.WriteLine($"[{e.Timestamp}] ({e.SensorId}) - {e.DataCase}");
             if (e.DataCase == SensorMessage.DataOneofCase.Gesture)
@@ -146,12 +152,12 @@ namespace emt_sdk_poc
                     while (true)
                     {
                         var key = Console.ReadKey(true).Key;
-                        server.RelayLocalEvent(new Naki3D.Common.Protocol.SensorMessage
+                        server.RelayLocalEvent(new SensorMessage
                         {
-                            KeyboardUpdate = new Naki3D.Common.Protocol.KeyboardUpdateData
+                            KeyboardUpdate = new KeyboardUpdateData
                             {
                                 Keycode = ((int)key),
-                                Type = Naki3D.Common.Protocol.KeyActionType.KeyDown
+                                Type = KeyActionType.KeyDown
                             }
                         });
                     }
@@ -162,9 +168,9 @@ namespace emt_sdk_poc
         {
             //var loader = new PackageLoader(null);
             //var packages = loader.EnumeratePackages(false);
-            //Task.Run(ContentManager);
+            Task.Run(ContentManager);
 
-            Task.Run(EventServer);
+            //Task.Run(EventServer);
             //await Relay();
 
             /*
