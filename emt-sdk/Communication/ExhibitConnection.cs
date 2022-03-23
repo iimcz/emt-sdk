@@ -82,15 +82,16 @@ namespace emt_sdk.Communication
 
             try
             {
-                _reconnectTimer.Start();
                 _client.Connect(_target);
                 _stream = _client.GetStream();
                 _jsonReader = new JsonObjectStringReader(_stream);
 
+                _reconnectTimer.Start();
                 ConnectionState = ConnectionStateEnum.Connected;
             }
             catch (Exception e) when (e is SocketException || e is IOException)
             {
+                ConnectionState = ConnectionStateEnum.Disconnected;
                 Logger.Error(e, $"Failed to connect to remote host");
                 return;
             }
