@@ -4,9 +4,9 @@
     {
         public class Color
         {
-            public float R { get; set; }
-            public float G { get; set; }
-            public float B { get; set; }
+            public float R { get; set; } = 1f;
+            public float G { get; set; } = 1f;
+            public float B { get; set; } = 1f;
         }
     
         /// <summary>
@@ -20,7 +20,7 @@
         public float Contrast { get; set; } = 1f;
 
         /// <summary>
-        /// Additive brightness of image (-1.0 - 1.0). IPW does not support HDR.
+        /// Multiplicative brightness of image (0.0 - 1.0). IPW does not support HDR.
         /// </summary>
         public Color Brightness { get; set; } = new Color();
     }
