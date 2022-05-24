@@ -166,6 +166,12 @@ namespace emt_sdk.Generated.ScenePackage
 
         [JsonProperty("videoEvents", NullValueHandling = NullValueHandling.Ignore)]
         public List<VideoEvent> VideoEvents { get; set; }
+
+        [JsonProperty("rotationSpeed", NullValueHandling = NullValueHandling.Ignore)]
+        public double? RotationSpeed { get; set; }
+
+        [JsonProperty("cameraVerticalAngle", NullValueHandling = NullValueHandling.Ignore)]
+        public double? CameraVerticalAngle { get; set; }
     }
 
     public partial class CameraAnimation
