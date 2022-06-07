@@ -214,6 +214,8 @@ namespace emt_sdk.Events
 
             IPEndPoint endPoint = client.Client.LocalEndPoint as IPEndPoint;
             var address = endPoint.Address.GetAddressBytes();
+            Logger.Info($"Received connection from {endPoint.Address}");
+
             if (true /* some custom address filtering here for 2nd interface*/)
             {
                 lock (_localIncoming) _localIncoming.Add(stream);
@@ -240,7 +242,11 @@ namespace emt_sdk.Events
                             Value = a.MapValue(sensorEvent)
                         });
 
-                    foreach (var raisedEffect in raisedEffects) OnEffectCalled?.Invoke(this, raisedEffect);
+                    foreach (var raisedEffect in raisedEffects)
+                    {
+                        Logger.Debug($"Executing effect '{raisedEffect.Name}'");
+                        OnEffectCalled?.Invoke(this, raisedEffect);
+                    }
                 }
             }
             catch (InvalidProtocolBufferException e)
@@ -249,8 +255,6 @@ namespace emt_sdk.Events
             }
             catch (SocketException e)
             {
-                // TODO: Test unexpected cases
-                // TODO: Test on linux
                 Logger.Error("Socket error on event connection ", e);
             }
             finally
@@ -258,6 +262,8 @@ namespace emt_sdk.Events
                 Interlocked.Decrement(ref _listeners);
                 lock (_localIncoming) _localIncoming.Remove(stream);
                 if (client.Connected) client.Close();
+
+                Logger.Info($"Closed connection with {endPoint.Address}");
             }
         }
     }

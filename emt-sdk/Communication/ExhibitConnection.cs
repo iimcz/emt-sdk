@@ -88,6 +88,7 @@ namespace emt_sdk.Communication
 
                 _reconnectTimer.Start();
                 ConnectionState = ConnectionStateEnum.Connected;
+                Logger.Info($"Connected to remote exhibit server at {_target}");
             }
             catch (Exception e) when (e is SocketException || e is IOException)
             {
@@ -170,6 +171,7 @@ namespace emt_sdk.Communication
                     
                     Verified = ack.Verified;
                     verificationCompleted = true;
+                    Logger.Info("Connection verified, waiting for commands");
                 }
                 catch (Exception e) when (e is IOException || e is InvalidDataException)
                 {
@@ -236,6 +238,7 @@ namespace emt_sdk.Communication
                 ClientVersion.WriteJsonTo(_stream);
                 ServerVersion = VersionInfo.Parser.ParseJson(_jsonReader.NextJsonObject());
                 if (!IsVersionCompatible(ServerVersion)) throw new InvalidOperationException();
+                Logger.Info($"Server version: ${ServerVersion}");
             }
             catch (Exception e) when (e is InvalidProtocolBufferException || e is IOException || e is InvalidDataException)
             {
@@ -271,10 +274,12 @@ namespace emt_sdk.Communication
                 switch (msg.MessageCase)
                 {
                     case ServerMessage.MessageOneofCase.LoadPackage:
+                        Logger.Info($"Received load remote package command");
                         ConnectionState = ConnectionStateEnum.PackageInfoReceived;
                         LoadPackageHandler(msg.LoadPackage);
                         break;
                     case ServerMessage.MessageOneofCase.ClearPackage:
+                        Logger.Info($"Received clear package command");
                         ClearPackageHandler(msg.ClearPackage);
                         break;
                     default:

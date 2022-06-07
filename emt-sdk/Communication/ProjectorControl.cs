@@ -7,6 +7,8 @@ namespace emt_sdk.Communication
 {
     public class ProjectorControl
     {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+
         private readonly List<NetworkStream> _streams;
         
         public ProjectorControl(List<NetworkStream> streams)
@@ -28,6 +30,8 @@ namespace emt_sdk.Communication
             {
                 foreach (var stream in _streams) message.WriteDelimitedTo(stream);
             }
+
+            Logger.Info("Sent power on CEC messages");
         }
 
         public void PowerOff()
@@ -44,6 +48,8 @@ namespace emt_sdk.Communication
             {
                 foreach (var stream in _streams) message.WriteDelimitedTo(stream);
             }
+
+            Logger.Info("Sent power off CEC messages");
         }
     }
 }

@@ -51,6 +51,8 @@ namespace emt_sdk.Generated.ScenePackage
             {
                 zip.ExtractToDirectory(PackageDirectory);
             }
+
+            Logger.Info($"Extracted package to '{ArchivePath}'");
         }
 
         public bool VerifyChecksum(string checksum)
@@ -115,6 +117,8 @@ namespace emt_sdk.Generated.ScenePackage
             if (!IsDownloaded()) throw new FileNotFoundException();
             File.Delete(ArchiveFileName);
             Directory.Delete(PackageDirectory);
+
+            Logger.Info($"Removed package '{ArchivePath}'");
         }
 
         /// <summary>
@@ -123,7 +127,13 @@ namespace emt_sdk.Generated.ScenePackage
         /// <returns>Launched process</returns>
         public Process Run()
         {
-            if (Parameters.DisplayType != "scene") throw new NotSupportedException();
+            if (Parameters.DisplayType != "scene")
+            {
+                Logger.Error($"Attempted to launch a non-native package '{ArchivePath}' as native");
+                throw new NotSupportedException($"Attempted to launch a non-native package '{ArchivePath}' as native");
+            }
+
+            Logger.Info($"Launching native 3D scene package '{ArchivePath}'");
             return Process.Start(new ProcessStartInfo
             {
                 FileName = Path.Combine(DataRoot, "scene.x86_64")
