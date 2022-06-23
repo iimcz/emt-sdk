@@ -26,7 +26,7 @@ namespace emt_sdk.Settings
         /// <summary>
         /// Settings for all remote connections
         /// </summary>
-        public CommunicationSettings Communication { get; set; }
+        public CommunicationSettings Communication { get; set; } = new CommunicationSettings();
 
         /// <summary>
         /// Name of default package loaded at startup
