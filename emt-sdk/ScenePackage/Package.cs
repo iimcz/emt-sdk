@@ -33,6 +33,12 @@ namespace emt_sdk.Generated.ScenePackage
         /// </summary>
         public void DownloadFile()
         {
+            if (IsDownloaded())
+            {
+                Logger.Info($"Package '{Package.Checksum}' already downloaded, skipping");
+                return;
+            }
+
             using (var client = new WebClient()) client.DownloadFile(Package.Url, ArchivePath);
 
             if (!VerifyChecksum(Package.Checksum))
@@ -85,10 +91,6 @@ namespace emt_sdk.Generated.ScenePackage
             get
             {
                 return Package.Checksum + ".zip";
-                
-                var url = Package.Url;
-                var queryDictionary = System.Web.HttpUtility.ParseQueryString(url.Query);
-                return queryDictionary["packageName"];
             }
         }
 
