@@ -79,9 +79,7 @@ namespace emt_sdk.Events
         private TcpListener _listener;
         private int _listeners = 0;
 
-        private readonly List<TcpClient> _outgoingClients = new List<TcpClient>();
-        private readonly List<NetworkStream> _outgoingStreams = new List<NetworkStream>();
-
+        private readonly List<OutgoingEventConnection> _outgoingClients = new List<OutgoingEventConnection>();
         private readonly List<NetworkStream> _localIncoming = new List<NetworkStream>();
 
         public EventManager()
@@ -101,13 +99,13 @@ namespace emt_sdk.Events
             // In case it's a local event
             OnEventReceived?.Invoke(this, message);
 
-            if (_outgoingStreams.Count == 0)
+            if (_outgoingClients.Count == 0)
             {
                 Logger.Warn("No remote listeners connected, broadcasting event as local only");
                 return;
             }
 
-            foreach (var client in _outgoingStreams) message.WriteDelimitedTo(client);
+            foreach (var client in _outgoingClients) client.BroadcastEvent(message);
         }
 
         /// <summary>
@@ -146,17 +144,13 @@ namespace emt_sdk.Events
             }
             
             _outgoingClients.Clear();
-            _outgoingStreams.Clear();
             lock (_localIncoming) _localIncoming.Clear();
 
             _listener = new TcpListener(ipAddr, port);
             _tokenSource = new CancellationTokenSource();
 
-            if (sync == null)
-            {
-                Logger.Warn("No sync info specified, running in listen only mode");
-                Task.Run(() => EstabilishOutgoing(sync), _tokenSource.Token);
-            }
+            if (sync == null) Logger.Warn("No sync info specified, running in listen only mode");
+            else Task.Run(() => EstabilishOutgoing(sync), _tokenSource.Token);
 
             _listener.Start();
             Logger.Info($"Listening on port {port} for incoming events");
@@ -192,7 +186,7 @@ namespace emt_sdk.Events
         public void Stop()
         {
             _tokenSource?.Cancel();
-            foreach (var client in _outgoingClients) client.Close();
+            foreach (var client in _outgoingClients) client.Dispose();
         }
 
         private void EstabilishOutgoing(Sync sync)
@@ -200,11 +194,14 @@ namespace emt_sdk.Events
             for (int i = 0; i < sync.Elements.Count; i++)
             {
                 if (sync.SelfIndex == i) continue;
-                TcpClient client = new TcpClient(sync.Elements[i].Hostname, SENSOR_MESSAGE_PORT);
 
-                _outgoingClients.Add(client);
-                _outgoingStreams.Add(client.GetStream());
+                var connection = new OutgoingEventConnection(sync.Elements[i].Hostname, SENSOR_MESSAGE_PORT);
+                connection.Connect();
+
+                _outgoingClients.Add(connection);
             }
+
+            Logger.Info($"Created connection with all ({sync.Elements.Count - 1}) sync targets");
         }
 
         private void HandleConnection(TcpClient client, CancellationToken token)
@@ -231,6 +228,20 @@ namespace emt_sdk.Events
                     // TODO: that read could use that cancellation token for sure...
                     var sensorEvent = SensorMessage.Parser.ParseDelimitedFrom(stream);
                     if (sensorEvent.DataCase == SensorMessage.DataOneofCase.None) continue;
+
+                    // TODO: Add ping to JSON schema
+                    if (sensorEvent.DataCase == SensorMessage.DataOneofCase.Event && sensorEvent.Event.Name == "ping")
+                    {
+                        var pong = new SensorMessage
+                        {
+                            Event = new EventData
+                            {
+                                Name = "pong"
+                            }
+                        };
+
+                        pong.WriteDelimitedTo(stream);
+                    }
                     
                     OnEventReceived?.Invoke(this, sensorEvent);
                     

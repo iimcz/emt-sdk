@@ -12,7 +12,9 @@ namespace emt_sdk.Settings
     {
         private static string ConfigDirectory => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "emt");
         private static string ConfigPath => Path.Combine(ConfigDirectory, "emt.json");
-        
+
+        public static bool ConfigExists => File.Exists(ConfigPath);
+
         /// <summary>
         /// Type of current device
         /// </summary>
@@ -45,7 +47,7 @@ namespace emt_sdk.Settings
         /// </summary>
         public static EmtSetting FromConfig()
         {
-            if (!File.Exists(ConfigPath)) return null;
+            if (!ConfigExists) return null;
 
             var json = File.ReadAllText(ConfigPath);
             return JsonConvert.DeserializeObject<EmtSetting>(json);

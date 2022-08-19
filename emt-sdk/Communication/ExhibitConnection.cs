@@ -7,7 +7,6 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
-using emt_sdk.Generated.ScenePackage;
 using emt_sdk.Settings;
 using Google.Protobuf;
 
