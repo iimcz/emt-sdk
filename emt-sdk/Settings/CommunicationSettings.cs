@@ -13,13 +13,19 @@
         public int ContentPort { get; set; } = 3917;
 
         /// <summary>
-        /// IP used by <see cref="Events.EventManager"/> for listening for incoming sensor events
+        /// IP used by <see cref="Events.Local.EventManager"/> for listening for incoming sensor events
         /// </summary>
         public string SensorListenIp { get; set; }
 
         /// <summary>
-        /// Port used by <see cref="Events.EventManager"/> for listening for incoming sensor events
+        /// IP used by <see cref="Events.Local.EventManager"/> for listening for other emt_sdk devices
         /// </summary>
-        public int SensorListenPort { get; set; } = 5000;
+        public string InterdeviceListenIp { get; set; }
+
+        /// <summary>
+        /// Port used by <see cref="Events.Local.EventManager"/> for listening for incoming sensor events and emt_sdk devices.
+        /// Port is the same for both sensor and interdevice communication, connections get filtered based on their IP.
+        /// </summary>
+        public int EventListenPort { get; set; } = 5000;
     }
 }

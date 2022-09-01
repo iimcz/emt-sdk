@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using emt_sdk.Extensions;
-using emt_sdk.Events;
 using System.Threading.Tasks;
 using emt_sdk.Scene;
 using Naki3D.Common.Protocol;
@@ -14,6 +13,9 @@ using Newtonsoft.Json.Serialization;
 using emt_sdk.Generated.ScenePackage;
 using emt_sdk.Settings;
 using Action = emt_sdk.Generated.ScenePackage.Action;
+using emt_sdk.Events.Local;
+using emt_sdk.Events.Relay;
+using emt_sdk.Events;
 
 namespace emt_sdk_poc
 {
@@ -58,7 +60,7 @@ namespace emt_sdk_poc
         {
             Console.WriteLine("Starting server on port 5000");
             EventManager.Instance.OnEventReceived += Instance_OnEventReceived;
-            EventManager.Instance.OnEffectCalled += (sender, call) =>
+            EventManager.Instance.OnEffectCalled += (call) =>
             {
                 Console.WriteLine($"[CALL] {call.Name}: {call.Value?.ToString() ?? "void"}");
             };
@@ -114,13 +116,14 @@ namespace emt_sdk_poc
                 }
             });
             
-            EventManager.Instance.Start(new Sync
+            EventManager.Instance.ConnectSensor(new CommunicationSettings
             {
-                Elements = new List<Element>()
+                EventListenPort = 5000,
+                SensorListenIp = "0.0.0.0"
             });
         }
 
-        private static void Instance_OnEventReceived(object sender, SensorMessage e)
+        private static void Instance_OnEventReceived(SensorMessage e)
         {
             Console.WriteLine($"[{e.Timestamp}] ({e.SensorId}) - {e.DataCase}");
             if (e.DataCase == SensorMessage.DataOneofCase.Gesture)
@@ -138,7 +141,7 @@ namespace emt_sdk_poc
             {
                 case 'c':
                     var client = new EventRelayClient();
-                    client.OnEventReceived += (s, e) =>
+                    client.OnEventReceived += (e) =>
                     {
                         Console.WriteLine(e.DataCase);
                     };

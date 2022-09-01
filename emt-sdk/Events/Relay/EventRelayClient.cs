@@ -5,7 +5,7 @@ using System.Net.Sockets;
 using System.Threading;
 using static emt_sdk.Events.EventManager;
 
-namespace emt_sdk.Events
+namespace emt_sdk.Events.Relay
 {
     /// <summary>
     /// Client event relaying connection for any external applications using emt_sdk events.
@@ -56,7 +56,7 @@ namespace emt_sdk.Events
                     {
                         var sensorEvent = SensorMessage.Parser.ParseDelimitedFrom(_stream);
                         if (sensorEvent.DataCase == SensorMessage.DataOneofCase.None) continue;
-                        OnEventReceived?.Invoke(this, sensorEvent);
+                        OnEventReceived?.Invoke(sensorEvent);
                     }
                 }
                 catch (SocketException e)

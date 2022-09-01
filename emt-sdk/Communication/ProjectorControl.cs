@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-using System.Net.Sockets;
-using Google.Protobuf;
+using emt_sdk.Events.Local;
 using Naki3D.Common.Protocol;
 
 namespace emt_sdk.Communication
@@ -9,45 +7,35 @@ namespace emt_sdk.Communication
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        private readonly List<NetworkStream> _streams;
+        private readonly SensorManager _sensorManager;
         
-        public ProjectorControl(List<NetworkStream> streams)
+        public ProjectorControl(SensorManager sensorManager)
         {
-            _streams = streams;
+            _sensorManager = sensorManager;
         }
 
         public void PowerOn()
         {
-            var message = new SensorControlMessage
+            _sensorManager.BroadcastControlMessage(new SensorControlMessage
             {
                 CecMessage = new CECMessage
                 {
                     Action = CECAction.PowerOn
                 }
-            };
-
-            lock (_streams)
-            {
-                foreach (var stream in _streams) message.WriteDelimitedTo(stream);
-            }
+            });
 
             Logger.Info("Sent power on CEC messages");
         }
 
         public void PowerOff()
         {
-            var message = new SensorControlMessage
+            _sensorManager.BroadcastControlMessage(new SensorControlMessage
             {
                 CecMessage = new CECMessage
                 {
                     Action = CECAction.PowerOff
                 }
-            };
-
-            lock (_streams)
-            {
-                foreach (var stream in _streams) message.WriteDelimitedTo(stream);
-            }
+            });
 
             Logger.Info("Sent power off CEC messages");
         }

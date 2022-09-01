@@ -1,14 +1,15 @@
-﻿using Google.Protobuf;
+﻿using emt_sdk.Events.Local;
+using Google.Protobuf;
 using Naki3D.Common.Protocol;
 using System;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace emt_sdk.Events
+namespace emt_sdk.Events.Relay
 {
     /// <summary>
     /// Server event relaying connection for any external applications using emt_sdk events.
-    /// Relays local, remote and even relayed events to a connected <see cref="EventRelayClient"/>.<para />
+    /// Relays local, remote and even relayed events to a connected <see cref="EventRelayClient"/>.
     /// This should not be used in user code and is only for the main managing application.
     /// </summary>
     public class EventRelayServer
@@ -117,7 +118,7 @@ namespace emt_sdk.Events
             message.WriteDelimitedTo(_stream);
         }
 
-        private void OnEventReceived(object caller, SensorMessage message)
+        private void OnEventReceived(SensorMessage message)
         {
             if (!IsConnected)
             {

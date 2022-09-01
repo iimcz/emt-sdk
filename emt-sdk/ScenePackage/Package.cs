@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
-using emt_sdk.ScenePackage;
 
 namespace emt_sdk.Generated.ScenePackage
 {
