@@ -7,6 +7,7 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Action = emt_sdk.Generated.ScenePackage.Action;
 
 namespace emt_sdk.Events
@@ -69,6 +70,11 @@ namespace emt_sdk.Events
         public bool ConnectedRemote { get; private set; } = false;
         public List<Action> Actions { get; } = new List<Action>();
 
+        /// <summary>
+        /// Hosts a local sensor server. This method will not block the current thread.
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <exception cref="InvalidOperationException"></exception>
         public void ConnectSensor(CommunicationSettings settings)
         {
             if (SensorManager != null)
@@ -79,8 +85,16 @@ namespace emt_sdk.Events
 
             SensorManager = new SensorManager(settings);
             SensorManager.OnMessage += HandleMessage;
+
+            Task.Run(() => SensorManager.Start());
         }
 
+        /// <summary>
+        /// Connects to remote interdevice relay or hosts one depending on <paramref name="sync"/>. This method will not block the current thread.
+        /// </summary>
+        /// <param name="sync">emt_sdk device information</param>
+        /// <param name="settings">Network settings</param>
+        /// <exception cref="InvalidOperationException"></exception>
         public void ConnectRemote(Sync sync, CommunicationSettings settings)
         {
             if (_interdeviceEventRelay != null || _outgoingEventConnection != null)
@@ -98,6 +112,8 @@ namespace emt_sdk.Events
 
                 _interdeviceEventRelay = new InterdeviceEventRelay(settings);
                 _interdeviceEventRelay.OnMessage += HandleMessage;
+
+                Task.Run(() => _interdeviceEventRelay.Start());
             }
             else
             {
@@ -105,6 +121,8 @@ namespace emt_sdk.Events
 
                 _outgoingEventConnection = new OutgoingEventConnection(sync, settings);
                 _outgoingEventConnection.OnMessage += HandleMessage;
+
+                Task.Run(() => _outgoingEventConnection.Connect());
             }
         }
 

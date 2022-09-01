@@ -32,6 +32,9 @@ namespace emt_sdk.Communication
             _listener = new TcpListener(listenAddress, port);
         }
 
+        /// <summary>
+        /// Listens for new connections and receives messages from each created connection. This call will block the current thread.
+        /// </summary>
         public void Start()
         {
             _listener.Start();

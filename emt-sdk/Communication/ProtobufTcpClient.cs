@@ -35,15 +35,13 @@ namespace emt_sdk.Communication
             _hostname = hostname;
             _port = port;
 
-            _client = new TcpClient(hostname, port);
-            _stream = _client.GetStream();
-
             _timeoutTimer.Elapsed += (sender, e) => Ping();
             _reconnectTimer.Elapsed += (sender, e) => Reconnect();
-
-            Task.Run(ReadMessages, _tokenSource.Token);
         }
 
+        /// <summary>
+        /// Connects to specified remote server and listens for messages. This call will block the current thread.
+        /// </summary>
         public void Connect()
         {
             _client?.Dispose();
@@ -62,6 +60,8 @@ namespace emt_sdk.Communication
                 _timeoutTimer.Start();
 
                 Logger.Info($"Connected to target at {_hostname}:{_port}");
+
+                ReadMessages();
             }
             catch (Exception e) when (e is SocketException || e is IOException)
             {
