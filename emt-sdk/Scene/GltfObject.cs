@@ -1,4 +1,4 @@
-﻿using Naki3D.Common.Protocol;
+using Naki3D.Common.Protocol;
 using System.Collections.Generic;
 
 namespace emt_sdk.Scene
@@ -115,6 +115,11 @@ namespace emt_sdk.Scene
             /// Time in seconds it takes to spin around the object once
             /// </summary>
             public float RevolutionTime { get; set; }
+
+            /// <summary>
+            /// Whether the camera can be manually controlled using hand gestures (leap-like)
+            /// </summary>
+            public bool AllowHandControl { get; set; }
         }
 
         /// <summary>
