@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="../emt-common/protobuf/*.proto" />
+    <Protobuf ProtoRoot="../emt-common/protobuf/" Include="../emt-common/protobuf/**/*.proto" />
   </ItemGroup>
 
   <ItemGroup>
