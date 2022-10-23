@@ -27,5 +27,10 @@
         /// Port is the same for both sensor and interdevice communication, connections get filtered based on their IP.
         /// </summary>
         public int EventListenPort { get; set; } = 5000;
+
+        /// <summary>
+        /// Hostname of NTP server, can be null for default european NTP server defined in <see cref="Events.NtpSync.NtpScheduler"/> (requires outside internet connection)
+        /// </summary>
+        public string NtpHostname { get; set; }
     }
 }
