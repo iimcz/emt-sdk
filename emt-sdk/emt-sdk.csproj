@@ -17,6 +17,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.14" />
     <PackageReference Include="NLog" Version="4.7.12" />
+    <PackageReference Include="Yort.Ntp.Portable" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -97,6 +98,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="UnityPackage\package\Runtime\System.Threading.Tasks.Extensions.dll.meta">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="UnityPackage\package\Runtime\Yort.Ntp.dll.meta">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
