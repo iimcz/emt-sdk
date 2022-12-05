@@ -85,6 +85,7 @@ namespace emt_sdk.Events
 
             SensorManager = new SensorManager(settings);
             SensorManager.OnMessage += HandleMessage;
+            SensorManager.OnMessage += HandleLocalMessage;
 
             Task.Run(() => SensorManager.Start());
         }
@@ -151,6 +152,12 @@ namespace emt_sdk.Events
                 Logger.Debug($"Executing effect '{raisedEffect.Name}'");
                 OnEffectCalled?.Invoke(raisedEffect);
             }
+        }
+
+        private void HandleLocalMessage(SensorMessage message)
+        {
+            // Relay all local events
+            BroadcastEvent(message);
         }
     }
 }
