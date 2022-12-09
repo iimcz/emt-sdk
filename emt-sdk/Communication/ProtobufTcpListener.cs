@@ -102,14 +102,18 @@ namespace emt_sdk.Communication
             }
             catch (SocketException e)
             {
-                Logger.Error("Socket error on protobuf connection ", e);
+                Logger.Error("Socket error on protobuf connection", e);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Exception occuer when handling sensor message");
             }
             finally
             {
+                Logger.Info($"Closed connection with {clientInfo.tcpClient.Client.RemoteEndPoint}");
+
                 lock (_clients) _clients.Remove(clientInfo);
                 if (clientInfo.tcpClient.Connected) clientInfo.tcpClient.Close();
-
-                Logger.Info($"Closed connection with {clientInfo.tcpClient.Client.RemoteEndPoint}");
             }
         }
 

@@ -16,11 +16,14 @@ using Action = emt_sdk.Generated.ScenePackage.Action;
 using emt_sdk.Events.Local;
 using emt_sdk.Events.Relay;
 using emt_sdk.Events;
+using NLog;
 
 namespace emt_sdk_poc
 {
     class Program
     {
+        protected static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         static async Task ContentManager()
         {
             var settings = new CommunicationSettings
@@ -115,20 +118,35 @@ namespace emt_sdk_poc
                     OutMax = 1,
                 }
             });
-            
-            EventManager.Instance.ConnectSensor(new CommunicationSettings
+
+            var commsettings = new CommunicationSettings
             {
                 EventListenPort = 5000,
-                SensorListenIp = "0.0.0.0"
-            });
+                SensorListenIp = "0.0.0.0",
+                InterdeviceListenIp = "1.2.3.4"
+            };
+
+            EventManager.Instance.ConnectRemote(new Sync
+            {
+                SelfIndex = 0,
+                Elements = new List<Element>
+                {
+                    new Element
+                    {
+                        Hostname = "pgebox"
+                    }
+                }
+            }, commsettings);
+            
+            EventManager.Instance.ConnectSensor(commsettings);
         }
 
         private static void Instance_OnEventReceived(SensorMessage e)
         {
             Console.WriteLine($"[{e.Timestamp}] ({e.SensorId}) - {e.DataCase}");
-            if (e.DataCase == SensorMessage.DataOneofCase.Gesture)
+            if (e.DataCase == SensorMessage.DataOneofCase.HandTracking)
             {
-                Console.WriteLine(e.Gesture.Type);
+                Console.WriteLine(e.HandTracking.Gesture);
             }
         }
 
@@ -169,11 +187,12 @@ namespace emt_sdk_poc
 
         static async Task Main(string[] args)
         {
+            Logger.Info("Testing NLog output");
             //var loader = new PackageLoader(null);
             //var packages = loader.EnumeratePackages(false);
-            Task.Run(ContentManager);
+            //Task.Run(ContentManager);
 
-            //Task.Run(EventServer);
+            Task.Run(EventServer);
             //await Relay();
 
             /*
