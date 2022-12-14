@@ -39,6 +39,9 @@ namespace emt_sdk.Generated.ScenePackage
                         case SensorMessage.DataOneofCase.Gesture:
                             eventName = message.Gesture.Type.ToString();
                             break;
+                        case SensorMessage.DataOneofCase.HandMovement:
+                            eventName = message.HandTracking.Gesture.ToString();
+                            break;
                         default:
                             return false;
                     }
