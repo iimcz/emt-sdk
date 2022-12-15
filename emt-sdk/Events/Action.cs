@@ -61,7 +61,7 @@ namespace emt_sdk.Generated.ScenePackage
             {
                 {Condition.Above, (value, threshold) => value > threshold },
                 {Condition.Below, (value, threshold) => value < threshold },
-                {Condition.Equals, (value, threshold) => value - threshold <= float.Epsilon },
+                {Condition.Equals, (value, threshold) => value == threshold },
                 {Condition.AboveOrEquals, (value, threshold) => value >= threshold },
                 {Condition.BelowOrEquals, (value, threshold) => value <= threshold }
             };
