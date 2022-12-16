@@ -136,7 +136,8 @@ namespace emt_sdk.Generated.ScenePackage
             Logger.Info($"Launching native 3D scene package '{ArchivePath}'");
             return Process.Start(new ProcessStartInfo
             {
-                FileName = Path.Combine(DataRoot, "scene.x86_64")
+                FileName = Path.Combine(DataRoot, Parameters?.Settings?.FileName ?? "scene.x86_64"),
+                UseShellExecute = false
             });
         }
     }
