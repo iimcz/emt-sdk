@@ -1,5 +1,4 @@
-﻿using emt_sdk.Events.Local;
-using Google.Protobuf;
+﻿using Google.Protobuf;
 using Naki3D.Common.Protocol;
 using System;
 using System.Net.Sockets;
@@ -26,11 +25,10 @@ namespace emt_sdk.Events.Relay
         public bool IsConnected { get; private set; }
 
         /// <summary>
-        /// Token for closing socket connection, may be closed after receiving one more event
+        /// Token source for closing socket connection, may be closed after receiving one more event
         /// </summary>
-        public CancellationToken CancellationToken => _tokenSource.Token;
+        public CancellationTokenSource TokenSource;
 
-        private CancellationTokenSource _tokenSource;
         private NetworkStream _stream;
 
         /// <summary>
@@ -47,8 +45,8 @@ namespace emt_sdk.Events.Relay
             EventManager.Instance.OnEventReceived += OnEventReceived;
             Logger.Info($"Listening for relay messages on port {port}");
 
-            _tokenSource = new CancellationTokenSource();
-            using (_tokenSource.Token.Register(() => listener.Stop()))
+            TokenSource = new CancellationTokenSource();
+            using (TokenSource.Token.Register(() => listener.Stop()))
             {
                 try
                 {
@@ -62,7 +60,7 @@ namespace emt_sdk.Events.Relay
 
                         try
                         {
-                            while (!_tokenSource.Token.IsCancellationRequested)
+                            while (!TokenSource.Token.IsCancellationRequested)
                             {
                                 var sensorEvent = SensorMessage.Parser.ParseDelimitedFrom(_stream);
                                 if (sensorEvent.DataCase == SensorMessage.DataOneofCase.None) continue;

@@ -21,16 +21,15 @@ namespace emt_sdk.Events.Relay
         public bool IsConnected { get; private set; }
 
         /// <summary>
-        /// Token for closing socket connection, may be closed after receiving one more event
+        /// Token source for closing socket connection, may be closed after receiving one more event
         /// </summary>
-        public CancellationToken CancellationToken => _tokenSource.Token;
+        public CancellationTokenSource TokenSource;
 
         /// <summary>
         /// Called whenever a <see cref="SensorMessage"/> is received from relay server
         /// </summary>
         public event SensorMessageHandler OnEventReceived;
 
-        private CancellationTokenSource _tokenSource;
         private NetworkStream _stream;
 
         /// <summary>
@@ -43,8 +42,8 @@ namespace emt_sdk.Events.Relay
         {
             var client = new TcpClient("localhost", port);
 
-            _tokenSource = new CancellationTokenSource();
-            using (_tokenSource.Token.Register(() => client.Close()))
+            TokenSource = new CancellationTokenSource();
+            using (TokenSource.Token.Register(() => client.Close()))
             {
                 try
                 {
@@ -52,7 +51,7 @@ namespace emt_sdk.Events.Relay
                     Logger.Info($"Connected to relay server on port {port}");
                     IsConnected = true;
 
-                    while (true)
+                    while (!TokenSource.Token.IsCancellationRequested)
                     {
                         var sensorEvent = SensorMessage.Parser.ParseDelimitedFrom(_stream);
                         if (sensorEvent.DataCase == SensorMessage.DataOneofCase.None) continue;
