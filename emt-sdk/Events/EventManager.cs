@@ -129,7 +129,10 @@ namespace emt_sdk.Events
 
         public void BroadcastEvent(SensorMessage message)
         {
-            if (!ConnectedRemote) throw new InvalidOperationException("EventManager is not connected to remote");
+            if (!ConnectedRemote) {
+                Logger.Warn("EventManager is not connected to remote");
+                return;
+            }
 
             if (IsInterdeviceRelay) InterdeviceEventRelay.BroadcastSensorMessage(message);
             else OutgoingEventConnection.SendEvent(message);
