@@ -130,7 +130,8 @@ namespace emt_sdk.Events
         public void BroadcastEvent(SensorMessage message)
         {
             if (!ConnectedRemote) {
-                Logger.Warn("EventManager is not connected to remote");
+                // This is not an error here, it just means we're operating alone.
+                Logger.Debug("EventManager is not connected to remote");
                 return;
             }
 
