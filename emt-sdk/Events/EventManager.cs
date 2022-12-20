@@ -113,7 +113,15 @@ namespace emt_sdk.Events
             ConnectedRemote = true;
 
             // Check whether we're hosting
-            if (sync.SelfIndex == 0)
+            var selfIndex = sync.Elements
+                .FirstOrDefault(e => e.Hostname.ToLowerInvariant() == Dns.GetHostName().ToLowerInvariant());
+
+            if (selfIndex == null)
+            {
+                Logger.Error($"Could not find current hostname ({Dns.GetHostName()}) in sync data! Assuming this isn't host!");
+            }
+
+            if (selfIndex == sync.Elements.First())
             {
                 IsInterdeviceRelay = true;
 
