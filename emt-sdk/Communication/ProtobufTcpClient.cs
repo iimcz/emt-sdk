@@ -56,10 +56,10 @@ namespace emt_sdk.Communication
             {
                 Logger.Info($"Attempting to connect to target at {_hostname}:{_port}");
 
-                _client.Connect(_hostname, _port);
-                _stream = _client.GetStream();
-
                 _reconnectTimer.Start();
+                _client.Connect(_hostname, _port);
+
+                _stream = _client.GetStream();
                 _timeoutTimer.Start();
 
                 Logger.Info($"Connected to target at {_hostname}:{_port}");
