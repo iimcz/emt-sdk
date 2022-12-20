@@ -12,7 +12,7 @@ namespace emt_sdk.Events.Remote
     {
         public event SensorMessageHandler OnMessage;
 
-        public InterdeviceEventRelay(CommunicationSettings settings) : base(IPAddress.Parse(settings.InterdeviceListenIp), settings.EventListenPort) { }
+        public InterdeviceEventRelay(CommunicationSettings settings) : base(IPAddress.Parse(settings.InterdeviceListenIp), settings.InterdeviceListenPort) { }
 
         public void BroadcastSensorMessage(SensorMessage message)
         {

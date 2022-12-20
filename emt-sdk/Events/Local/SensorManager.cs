@@ -18,7 +18,7 @@ namespace emt_sdk.Events.Local
 
         public event SensorMessageHandler OnMessage;
 
-        public SensorManager(CommunicationSettings settings) : base(IPAddress.Parse(settings.SensorListenIp), settings.EventListenPort)
+        public SensorManager(CommunicationSettings settings) : base(IPAddress.Parse(settings.SensorListenIp), settings.SensorListenPort)
         {
             ProjectorControl = new ProjectorControl(this);
         }

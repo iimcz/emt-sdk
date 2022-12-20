@@ -20,7 +20,7 @@ namespace emt_sdk.Events.Remote
 
         public event SensorMessageHandler OnMessage;
 
-        public OutgoingEventConnection(Sync sync, CommunicationSettings settings) : base(sync.Elements[0].Hostname, settings.EventListenPort) { }
+        public OutgoingEventConnection(Sync sync, CommunicationSettings settings) : base(sync.Elements[0].Hostname, settings.InterdeviceListenPort) { }
 
         /// <summary>
         /// Sends an event to target connected device

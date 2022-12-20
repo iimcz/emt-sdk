@@ -71,6 +71,8 @@ namespace emt_sdk.Events
         public bool ConnectedRemote { get; private set; } = false;
         public List<Action> Actions { get; } = new List<Action>();
 
+        private bool _logEvents = false;
+
         /// <summary>
         /// Hosts a local sensor server. This method will not block the current thread.
         /// </summary>
@@ -83,6 +85,9 @@ namespace emt_sdk.Events
                 Logger.Error("Attempted to connect to sensors more than once");
                 throw new InvalidOperationException("EventManager is already connected to sensors");
             }
+
+            _logEvents = settings.LogEvents;
+            if (_logEvents) Logger.Debug("Sensor event logging is enabled");
 
             SensorManager = new SensorManager(settings);
             SensorManager.OnMessage += HandleMessage;
@@ -142,6 +147,8 @@ namespace emt_sdk.Events
 
         private void HandleMessage(SensorMessage message)
         {
+            if (_logEvents) Logger.Debug(message);
+
             OnEventReceived?.Invoke(message);
 
             var raisedEffects = Actions

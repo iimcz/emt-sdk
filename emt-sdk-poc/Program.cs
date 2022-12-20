@@ -1,4 +1,4 @@
-﻿using emt_sdk.Communication;
+using emt_sdk.Communication;
 using emt_sdk.ScenePackage;
 using System;
 using System.Collections.Generic;
@@ -121,7 +121,7 @@ namespace emt_sdk_poc
 
             var commsettings = new CommunicationSettings
             {
-                EventListenPort = 5000,
+                SensorListenPort = 5000,
                 SensorListenIp = "0.0.0.0",
                 InterdeviceListenIp = "1.2.3.4"
             };
