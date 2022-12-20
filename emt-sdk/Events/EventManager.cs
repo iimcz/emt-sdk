@@ -179,7 +179,7 @@ namespace emt_sdk.Events
         private void HandleLocalMessage(SensorMessage message)
         {
             // Relay all local events
-            message.SensorId = $"{Dns.GetHostName()}/{message.SensorId}";
+            message.SensorId = $"/{Dns.GetHostName()}/{message.SensorId}";
             BroadcastEvent(message);
         }
     }
