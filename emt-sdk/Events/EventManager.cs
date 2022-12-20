@@ -7,6 +7,7 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Action = emt_sdk.Generated.ScenePackage.Action;
 
@@ -161,6 +162,7 @@ namespace emt_sdk.Events
         private void HandleLocalMessage(SensorMessage message)
         {
             // Relay all local events
+            message.SensorId = $"{Dns.GetHostName()}/{message.SensorId}";
             BroadcastEvent(message);
         }
     }
