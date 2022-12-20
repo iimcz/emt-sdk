@@ -11,7 +11,7 @@ namespace emt_sdk.Communication
 {
     public abstract class ProtobufTcpListener<T> where T : IMessage<T>, new()
     {
-        protected static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        protected readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         // TODO: Changing timeout at runtime? Probably don't need it
         public int Timeout { get; set; }
@@ -27,8 +27,10 @@ namespace emt_sdk.Communication
 
         public ProtobufTcpListener(IPAddress listenAddress, int port)
         {
+            Logger = LogManager.GetCurrentClassLogger();
             if (listenAddress == null) throw new ArgumentNullException(nameof(listenAddress));
 
+            Logger.Info($"Listening on {listenAddress}:{port}");
             _listener = new TcpListener(listenAddress, port);
         }
 

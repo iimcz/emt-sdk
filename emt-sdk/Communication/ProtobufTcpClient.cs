@@ -11,7 +11,7 @@ namespace emt_sdk.Communication
 {
     public abstract class ProtobufTcpClient<T> : IDisposable where T : IMessage<T>, new()
     {
-        protected static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        protected readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         protected const double TIMEOUT_INTERVAL = 5_000;
         protected const double RECONNECT_INTERVAL = 5_000;
@@ -30,6 +30,7 @@ namespace emt_sdk.Communication
 
         public ProtobufTcpClient(string hostname, int port)
         {
+            Logger = LogManager.GetCurrentClassLogger();
             if (string.IsNullOrWhiteSpace(hostname)) throw new ArgumentException("Hostname cannot be null or empty", nameof(hostname));
 
             _hostname = hostname;
@@ -53,6 +54,8 @@ namespace emt_sdk.Communication
 
             try
             {
+                Logger.Info($"Attempting to connect to target at {_hostname}:{_port}");
+
                 _client.Connect(_hostname, _port);
                 _stream = _client.GetStream();
 

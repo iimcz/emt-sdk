@@ -125,6 +125,7 @@ namespace emt_sdk.Events
             {
                 IsInterdeviceRelay = true;
 
+                Logger.Info($"Device is first in Sync.Elements, starting InterdeviceEventRelay");
                 _interdeviceEventRelay = new InterdeviceEventRelay(settings);
                 _interdeviceEventRelay.OnMessage += HandleMessage;
 
@@ -134,6 +135,7 @@ namespace emt_sdk.Events
             {
                 IsInterdeviceRelay = false;
 
+                Logger.Info($"Device is secondary in Sync.Elements, starting OutgoingEventConnection");
                 _outgoingEventConnection = new OutgoingEventConnection(sync, settings);
                 _outgoingEventConnection.OnMessage += HandleMessage;
 
