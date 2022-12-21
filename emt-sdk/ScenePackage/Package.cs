@@ -116,7 +116,7 @@ namespace emt_sdk.Generated.ScenePackage
         {
             if (!IsDownloaded()) throw new FileNotFoundException();
             File.Delete(ArchiveFileName);
-            Directory.Delete(PackageDirectory);
+            Directory.Delete(PackageDirectory, true);
 
             Logger.Info($"Removed package '{ArchivePath}'");
         }
