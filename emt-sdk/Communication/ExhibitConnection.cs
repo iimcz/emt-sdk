@@ -60,6 +60,8 @@ namespace emt_sdk.Communication
             if (settings == null) throw new ArgumentNullException(nameof(settings));
 
             _id = id ?? Dns.GetHostName();
+            Logger.Info($"Current ID (Hostname): '{_id}'");
+
             _descriptor = descriptor ?? throw new ArgumentNullException(nameof(descriptor));
 
             var entry = Dns.GetHostEntry(settings.ContentHostname);
