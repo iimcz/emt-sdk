@@ -89,5 +89,24 @@ namespace emt_sdk.Events.Relay
 
             message.WriteDelimitedTo(_stream);
         }
+
+        /// <summary>
+        /// Broadcasts a custom event to the master relay server which will send it to all other connected devices.
+        /// </summary>
+        /// <param name="name">Event name</param>
+        /// <param name="parameters">Custom event parameters</param>
+        public void BroadcastEvent(string name, string parameters)
+        {
+            var message = new SensorMessage
+            {
+                Event = new EventData
+                {
+                    Name = name,
+                    Parameters = parameters
+                }
+            };
+
+            BroadcastEvent(message);
+        }
     }
 }
