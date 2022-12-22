@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -133,10 +134,22 @@ namespace emt_sdk.Generated.ScenePackage
                 throw new NotSupportedException($"Attempted to launch a non-native package '{ArchivePath}' as native");
             }
 
+            var fileName = Path.Combine(DataRoot, Parameters?.Settings?.FileName ?? "scene.x86_64");
+            
+            // We need to set the execute bit on Linux
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "chmod",
+                    Arguments = $"+x '{fileName}'"
+                }).WaitForExit();
+            }
+
             Logger.Info($"Launching native 3D scene package '{ArchivePath}'");
             return Process.Start(new ProcessStartInfo
             {
-                FileName = Path.Combine(DataRoot, Parameters?.Settings?.FileName ?? "scene.x86_64"),
+                FileName = fileName,
                 UseShellExecute = false
             });
         }
