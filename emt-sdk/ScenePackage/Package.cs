@@ -6,6 +6,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 
 namespace emt_sdk.Generated.ScenePackage
 {
@@ -38,7 +39,27 @@ namespace emt_sdk.Generated.ScenePackage
                 return;
             }
 
-            using (var client = new WebClient()) client.DownloadFile(Package.Url, ArchivePath);
+            using (var client = new WebClient())
+            {
+                var lastPercentage = 0;
+                client.DownloadProgressChanged += (s, e) =>
+                {
+                    if (lastPercentage == e.ProgressPercentage) return;
+
+                    lastPercentage = e.ProgressPercentage;
+                    Logger.Info($"Downloading package: {lastPercentage}%");
+                };
+
+                var syncObject = new object();
+                lock (syncObject)
+                {
+                    client.DownloadFileAsync(Package.Url, ArchivePath, syncObject);
+                    Monitor.Wait(syncObject);
+                }
+            }
+
+            Logger.Info($"Downloading package: 100%");
+
 
             if (!VerifyChecksum(Package.Checksum))
             {
