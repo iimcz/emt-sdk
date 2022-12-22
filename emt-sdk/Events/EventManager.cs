@@ -176,7 +176,7 @@ namespace emt_sdk.Events
             }
         }
 
-        private void HandleLocalMessage(SensorMessage message)
+        public void HandleLocalMessage(SensorMessage message)
         {
             // Relay all local events
             message.SensorId = $"/{Dns.GetHostName()}/{message.SensorId}";

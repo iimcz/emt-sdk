@@ -64,7 +64,7 @@ namespace emt_sdk.Events.Relay
                             {
                                 var sensorEvent = SensorMessage.Parser.ParseDelimitedFrom(_stream);
                                 if (sensorEvent.DataCase == SensorMessage.DataOneofCase.None) continue;
-                                EventManager.Instance.BroadcastEvent(sensorEvent);
+                                EventManager.Instance.HandleLocalMessage(sensorEvent);
                             }
                         }
                         catch (InvalidProtocolBufferException e)
