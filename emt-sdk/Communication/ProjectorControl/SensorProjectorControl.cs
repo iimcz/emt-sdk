@@ -1,15 +1,15 @@
 using emt_sdk.Events.Local;
 using Naki3D.Common.Protocol;
 
-namespace emt_sdk.Communication
+namespace emt_sdk.Communication.ProjectorControl
 {
-    public class ProjectorControl
+    public class SensorProjectorControl : IProjectorControl
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
         private readonly SensorManager _sensorManager;
-        
-        public ProjectorControl(SensorManager sensorManager)
+
+        public SensorProjectorControl(SensorManager sensorManager)
         {
             _sensorManager = sensorManager;
         }
