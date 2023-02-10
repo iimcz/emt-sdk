@@ -1,6 +1,6 @@
 ﻿using Naki3D.Common.Protocol;
 
-namespace emt_sdk.Settings
+namespace emt_sdk.Settings.IPW
 {
     /// <summary>
     /// Describes screen keystone transformation quad

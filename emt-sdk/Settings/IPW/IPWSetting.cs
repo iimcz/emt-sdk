@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace emt_sdk.Settings
+namespace emt_sdk.Settings.IPW
 {
     /// <summary>
     /// Settings for an Interactive Projection Wall

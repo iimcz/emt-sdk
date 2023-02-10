@@ -1,4 +1,4 @@
-﻿namespace emt_sdk.Settings
+﻿namespace emt_sdk.Settings.EMT
 {
     public class CommunicationSettings
     {
