@@ -1,27 +1,21 @@
-﻿using emt_sdk.Generated.ScenePackage;
-using emt_sdk.Settings;
-using Google.Protobuf;
+﻿using Google.Protobuf;
 using Naki3D.Common.Protocol;
-using System;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using emt_sdk.Communication;
 using static emt_sdk.Events.EventManager;
+using emt_sdk.Settings.EMT;
+using emt_sdk.Settings;
+using emt_sdk.Communication.Protobuf;
 
 namespace emt_sdk.Events.Local
 {
-    public class SensorManager : ProtobufTcpListener<SensorMessage>
+    public class ProtobufTcpSensorManager : ProtobufTcpListener<SensorMessage>, ISensorManager
     {
-        public ProjectorControl ProjectorControl { get; private set; }
-
         public event SensorMessageHandler OnMessage;
 
-        public SensorManager(CommunicationSettings settings) : base(IPAddress.Parse(settings.SensorListenIp), settings.SensorListenPort)
-        {
-            ProjectorControl = new ProjectorControl(this);
-        }
+        public ProtobufTcpSensorManager(IConfigurationProvider<EMTSetting> settings) : 
+            base(IPAddress.Parse(settings.Configuration.Communication.SensorListenIp), settings.Configuration.Communication.SensorListenPort) { }
 
         public void BroadcastControlMessage(SensorControlMessage message)
         {
@@ -36,8 +30,11 @@ namespace emt_sdk.Events.Local
 
         protected override void HandleConnection((TcpClient tcpClient, NetworkStream stream) clientInfo, CancellationToken cancellationToken)
         {
+            // TODO: Sometimes we can have a non-sensor based approach!
+            // Ideally the event of getting a new sensor shouldn't automatically trigger a CEC power on
+
             // Attempt to power on a projector (other sensors ignore this message)
-            ProjectorControl.PowerOn();
+            // ProjectorControl.PowerOn();
 
             base.HandleConnection(clientInfo, cancellationToken);
         }

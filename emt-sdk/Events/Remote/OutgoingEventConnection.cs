@@ -1,7 +1,6 @@
-﻿using emt_sdk.Communication;
-using emt_sdk.Events.Local;
+﻿using emt_sdk.Communication.Protobuf;
 using emt_sdk.Generated.ScenePackage;
-using emt_sdk.Settings;
+using emt_sdk.Settings.EMT;
 using Google.Protobuf;
 using Naki3D.Common.Protocol;
 using NLog;

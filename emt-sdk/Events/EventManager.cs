@@ -1,7 +1,7 @@
 ﻿using emt_sdk.Events.Local;
 using emt_sdk.Events.Remote;
 using emt_sdk.Generated.ScenePackage;
-using emt_sdk.Settings;
+using emt_sdk.Settings.EMT;
 using Naki3D.Common.Protocol;
 using NLog;
 using System;

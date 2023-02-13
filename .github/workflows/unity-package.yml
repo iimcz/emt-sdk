@@ -8,7 +8,7 @@ jobs:
     env:
       BUILD: 'emt-sdk/bin/Release/netstandard2.0'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.2.0
         with:
           token: ${{ secrets.CI_GITHUB_TOKEN }}
           submodules: recursive
@@ -27,7 +27,7 @@ jobs:
           cd ${BUILD}/UnityPackage/
           tar zcf emt-sdk.tgz package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3.1.1
         with:
           name: emt-sdk
           path: emt-sdk/bin/Release/netstandard2.0/UnityPackage/emt-sdk.tgz

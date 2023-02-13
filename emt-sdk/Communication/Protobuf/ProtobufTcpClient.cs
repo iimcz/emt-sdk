@@ -4,10 +4,9 @@ using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
 using Timer = System.Timers.Timer;
 
-namespace emt_sdk.Communication
+namespace emt_sdk.Communication.Protobuf
 {
     public abstract class ProtobufTcpClient<T> : IDisposable where T : IMessage<T>, new()
     {
@@ -18,7 +17,7 @@ namespace emt_sdk.Communication
 
         protected TcpClient _client;
         protected NetworkStream _stream;
-        
+
         protected readonly Timer _timeoutTimer = new Timer(TIMEOUT_INTERVAL);
         protected readonly Timer _reconnectTimer = new Timer(RECONNECT_INTERVAL);
 

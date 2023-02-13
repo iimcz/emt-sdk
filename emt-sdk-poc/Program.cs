@@ -1,4 +1,4 @@
-using emt_sdk.Communication;
+﻿using emt_sdk.Communication;
 using emt_sdk.ScenePackage;
 using System;
 using System.Collections.Generic;
@@ -128,7 +128,6 @@ namespace emt_sdk_poc
 
             EventManager.Instance.ConnectRemote(new Sync
             {
-                SelfIndex = 0,
                 Elements = new List<Element>
                 {
                     new Element
@@ -168,6 +167,7 @@ namespace emt_sdk_poc
                 case 's':
                     var server = new EventRelayServer();
                     var serverTask = Task.Run(() => server.Listen());
+                    EventManager.Instance.OnEventReceived += e => Logger.Info(e);
                     while (!server.IsConnected) { await Task.Delay(100); }
 
                     while (true)
@@ -188,12 +188,13 @@ namespace emt_sdk_poc
         static async Task Main(string[] args)
         {
             Logger.Info("Testing NLog output");
+            Logger.Info($"Current hostname: {System.Net.Dns.GetHostName()}");
             //var loader = new PackageLoader(null);
             //var packages = loader.EnumeratePackages(false);
             //Task.Run(ContentManager);
 
-            Task.Run(EventServer);
-            //await Relay();
+            //Task.Run(EventServer);
+            await Relay();
 
             /*
             while (true)

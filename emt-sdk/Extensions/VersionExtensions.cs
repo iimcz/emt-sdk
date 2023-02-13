@@ -1,5 +1,4 @@
-﻿using Naki3D.Common.Protocol;
-using System;
+﻿using System;
 namespace emt_sdk.Extensions
 {
     public static class VersionExtensions

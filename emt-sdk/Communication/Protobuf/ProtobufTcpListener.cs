@@ -7,7 +7,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace emt_sdk.Communication
+namespace emt_sdk.Communication.Protobuf
 {
     public abstract class ProtobufTcpListener<T> where T : IMessage<T>, new()
     {

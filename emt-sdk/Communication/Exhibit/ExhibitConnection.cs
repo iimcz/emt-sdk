@@ -7,10 +7,12 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
-using emt_sdk.Settings;
 using Google.Protobuf;
+using Grpc.Core;
+using emt_sdk.Settings.EMT;
+using emt_sdk.Communication.Protobuf;
 
-namespace emt_sdk.Communication
+namespace emt_sdk.Communication.Exhibit
 {
     public enum ConnectionStateEnum
     {
@@ -42,7 +44,7 @@ namespace emt_sdk.Communication
 
         public bool IsConnected => _client.Connected;
         public bool Verified { get; private set; } = false;
-        
+
         public VersionInfo ClientVersion { get; private set; }
         public VersionInfo ServerVersion { get; private set; }
         public ConnectionStateEnum ConnectionState { get; private set; } = ConnectionStateEnum.Disconnected;
@@ -97,15 +99,15 @@ namespace emt_sdk.Communication
                 Logger.Error(e, $"Failed to connect to remote host");
                 return;
             }
-            
+
             ServerVersion = null;
-            
+
             ConnectionState = ConnectionStateEnum.VersionCheck;
             CompareVersions();
             ConnectionState = ConnectionStateEnum.VerifyRequest;
             RequestConnection();
             _timeoutTimer.Start();
-            
+
             if (!Verified) WaitForVerification();
             SendDescriptor();
         }
@@ -125,7 +127,7 @@ namespace emt_sdk.Communication
             //EncryptionInfo = EncryptionInfo.Parser.ParseJson(_jsonReader.NextJsonObject());
             Task.Run(HandlePackages);
         }
-        
+
         private void TimeoutElapsed(object sender, ElapsedEventArgs e)
         {
             if (!_client.Connected)
@@ -133,7 +135,7 @@ namespace emt_sdk.Communication
                 _timeoutTimer.Stop();
                 return;
             }
-            
+
             var ping = new DeviceMessage
             {
                 ConnectionId = _id,
@@ -151,11 +153,11 @@ namespace emt_sdk.Communication
                 _timeoutTimer.Stop();
             }
         }
-        
+
         private void ReconnectElapsed(object sender, ElapsedEventArgs e)
         {
             if (_client.Connected) return;
-            
+
             ConnectionState = ConnectionStateEnum.Disconnected;
             Logger.Info("Not connected, reconneting");
             Connect();
@@ -169,7 +171,7 @@ namespace emt_sdk.Communication
                 try
                 {
                     var ack = ConnectionAcknowledgement.Parser.ParseJson(_jsonReader.NextJsonObject());
-                    
+
                     Verified = ack.Verified;
                     verificationCompleted = true;
                     Logger.Info("Connection verified, waiting for commands");
@@ -177,7 +179,7 @@ namespace emt_sdk.Communication
                 catch (Exception e) when (e is IOException || e is InvalidDataException)
                 {
                     if (_client.Connected) continue;
-                    
+
                     Logger.Error(e, "Verification failed, disconnecting");
                     _client.Close();
                     return; // Connection failed completely
@@ -187,7 +189,7 @@ namespace emt_sdk.Communication
             if (!Verified)
             {
                 Logger.Warn("Verification denied, closing connection without retry");
-                
+
                 ConnectionState = ConnectionStateEnum.VerificationDenied;
                 _client.Close();
                 _timeoutTimer.Stop();
@@ -207,7 +209,7 @@ namespace emt_sdk.Communication
             {
                 request.WriteJsonTo(_stream);
                 ConnectionState = ConnectionStateEnum.VerifyWait;
-                
+
                 // TODO: Do we need to check hostname? Probably not
                 var ack = ConnectionAcknowledgement.Parser.ParseJson(_jsonReader.NextJsonObject());
                 Verified = ack.Verified;
@@ -258,7 +260,7 @@ namespace emt_sdk.Communication
             while (_client.Connected)
             {
                 ServerMessage msg;
-                
+
                 try
                 {
                     msg = ServerMessage.Parser.ParseJson(_jsonReader.NextJsonObject());
@@ -266,12 +268,12 @@ namespace emt_sdk.Communication
                 catch (Exception e) when (e is InvalidProtocolBufferException || e is IOException || e is InvalidDataException)
                 {
                     if (_client.Connected) continue;
-                    
+
                     Logger.Error(e, "Package handling failed, disconnecting");
                     _client.Close();
                     return; // Connection failed completely
                 }
-                
+
                 switch (msg.MessageCase)
                 {
                     case ServerMessage.MessageOneofCase.LoadPackage:
@@ -292,7 +294,7 @@ namespace emt_sdk.Communication
         public void Dispose()
         {
             _client?.Dispose();
-            
+
             _timeoutTimer.Stop();
             _reconnectTimer.Stop();
         }
