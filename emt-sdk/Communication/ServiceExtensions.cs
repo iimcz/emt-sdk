@@ -1,4 +1,4 @@
-﻿using emt_sdk.Communication.Discovery;
+using emt_sdk.Communication.Discovery;
 using emt_sdk.Communication.ProjectorControl;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -33,6 +33,7 @@ namespace emt_sdk.Communication
         /// <param name="services"></param>
         public static void AddGrpcExhibitConnection(this IServiceCollection services)
         {
+            services.AddScoped<ConnectionService.ConnectionServiceBase, emt_sdk.Communication.Exhibit.ConnectionService>();
             // TODO: Thing
         }
     }

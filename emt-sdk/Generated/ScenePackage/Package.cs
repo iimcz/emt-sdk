@@ -77,6 +77,9 @@ namespace emt_sdk.Generated.ScenePackage
         [JsonProperty("author")]
         public string Author { get; set; }
 
+        [JsonProperty("id")]
+        public string Id { get; set; }
+
         [JsonProperty("description", NullValueHandling = NullValueHandling.Ignore)]
         public string Description { get; set; }
 

@@ -3,10 +3,12 @@ using Newtonsoft.Json.Schema;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using emt_sdk.Generated.ScenePackage;
 
-namespace emt_sdk.ScenePackage
+namespace emt_sdk.Packages
 {
+    // TODO: Add proper interface
     public class PackageLoader
     {
         private const string SCHEMA_PATH = @"../emt-common/json/package-schema.json";
@@ -97,6 +99,18 @@ namespace emt_sdk.ScenePackage
             }
 
             return packages;
+        }
+
+        /// <summary>
+        /// Attempts to find a package with a specified id. Returns null if package is not found.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="validate"></param>
+        /// <returns></returns>
+        public PackageDescriptor FindPackage(string id, bool validate = true)
+        {
+            var packages = EnumeratePackages(validate);
+            return packages.FirstOrDefault(p => p.Metadata.Id == id);
         }
     }
 }

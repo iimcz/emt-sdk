@@ -38,7 +38,9 @@ namespace emt_sdk.Generated.ScenePackage
                 return;
             }
 
+            Logger.Info($"Downloading package '{Metadata.PackageName}' / '{Metadata.Id}' from '{Package.Url}'");
             using (var client = new WebClient()) client.DownloadFile(Package.Url, ArchivePath);
+            Logger.Info($"Download complete");
 
             if (!VerifyChecksum(Package.Checksum))
             {
