@@ -1,6 +1,7 @@
 using emt_sdk.Communication.Discovery;
 using emt_sdk.Communication.ProjectorControl;
 using Microsoft.Extensions.DependencyInjection;
+using Naki3D.Common.Protocol;
 
 namespace emt_sdk.Communication
 {
