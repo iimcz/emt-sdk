@@ -13,13 +13,13 @@ jobs:
           token: ${{ secrets.CI_GITHUB_TOKEN }}
           submodules: recursive
       - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v1.7.2
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '5.0.x'
+          dotnet-version: '7.0.x'
       - name: Install dependencies
-        run: dotnet restore
+        run: dotnet restore emt-sdk
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build emt-sdk --configuration Release --no-restore
       - name: Package
       # If we copy any extra DLLs Unity will implode...
         run: |
