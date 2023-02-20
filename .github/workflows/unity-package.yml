@@ -7,6 +7,8 @@ jobs:
     runs-on: [self-hosted, linux]
     env:
       BUILD: 'emt-sdk/bin/Release/netstandard2.0'
+      # This pollutes working directory if we ever want to use git in the workflow!
+      DOTNET_INSTALL_DIR: './.dotnet'
     steps:
       - uses: actions/checkout@v3.2.0
         with:
@@ -21,7 +23,7 @@ jobs:
       - name: Build
         run: dotnet build emt-sdk --configuration Release --no-restore
       - name: Package
-      # If we copy any extra DLLs Unity will implode...
+        # If we copy any extra DLLs Unity will implode...
         run: |
           cp -t ${BUILD}/UnityPackage/package/Runtime/ ${BUILD}/emt-sdk.dll ${BUILD}/Google.Protobuf.dll ${BUILD}/Microsoft.CodeAnalysis.CSharp.dll ${BUILD}/Microsoft.CodeAnalysis.CSharp.Scripting.dll ${BUILD}/Microsoft.CodeAnalysis.dll ${BUILD}/Microsoft.CodeAnalysis.Scripting.dll ${BUILD}/Newtonsoft.Json.Schema.dll ${BUILD}/System.Buffers.dll ${BUILD}/System.Collections.Immutable.dll ${BUILD}/System.Memory.dll ${BUILD}/System.Numerics.Vectors.dll ${BUILD}/System.Reflection.Metadata.dll ${BUILD}/System.Reflection.TypeExtensions.dll ${BUILD}/System.Runtime.CompilerServices.Unsafe.dll ${BUILD}/System.Text.Encoding.CodePages.dll ${BUILD}/System.Threading.Tasks.Extensions.dll ${BUILD}/NLog.dll ${BUILD}/NLog.config ${BUILD}/Yort.Ntp.dll
           cd ${BUILD}/UnityPackage/
