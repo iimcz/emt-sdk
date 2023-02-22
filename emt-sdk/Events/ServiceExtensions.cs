@@ -14,24 +14,6 @@ namespace emt_sdk.Events
     public static class ServiceExtensions
     {
         /// <summary>
-        /// Adds a <see cref="IDiscoveryService"/> broadcasting over UDP.
-        /// </summary>
-        /// <param name="services">Service container</param>
-        public static void AddUDPDiscovery(this IServiceCollection services)
-        {
-            services.AddSingleton<IDiscoveryService, UDPDiscoveryService>();
-        }
-
-        /// <summary>
-        /// Adds a <see cref="IProjectorControl"/> using protobuf defined messages sent to sensors.
-        /// </summary>
-        /// <param name="services">Service container</param>
-        public static void AddSensorProjectorControl(this IServiceCollection services)
-        {
-            services.AddTransient<IProjectorControl, SensorProjectorControl>();
-        }
-
-        /// <summary>
         /// Adds a <see cref="NtpScheduler"/> for synchronizing events across multiple devices.
         /// </summary>
         /// <param name="services">Service container</param>

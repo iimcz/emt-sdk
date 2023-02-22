@@ -13,7 +13,10 @@ namespace emt_sdk.Communication.Exhibit
 
         private readonly Server _server;
 
-        public GrpcServer(ConnectionService connection, DeviceService device, PackageService package, IConfigurationProvider<EMTSetting> config)
+        public GrpcServer(Naki3D.Common.Protocol.ConnectionService.ConnectionServiceBase connection,
+                          Naki3D.Common.Protocol.DeviceService.DeviceServiceBase device,
+                          Naki3D.Common.Protocol.PackageService.PackageServiceBase package,
+                          IConfigurationProvider<EMTSetting> config)
         {
             Logger.Info($"Creating GRPC server connection on '0.0.0.0:{config.Configuration.Communication.ContentPort}'");
 
