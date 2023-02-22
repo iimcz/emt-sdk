@@ -9,25 +9,25 @@ namespace emt_sdk.Settings.IPW
     /// </summary>
     public class SkewSetting
     {
-        public Vector2 TopLeft { get; set; } = new Vector2
+        public Vector2Data TopLeft { get; set; } = new Vector2Data
         {
             X = -1,
             Y = 1
         };
 
-        public Vector2 TopRight { get; set; } = new Vector2
+        public Vector2Data TopRight { get; set; } = new Vector2Data
         {
             X = 1,
             Y = 1
         };
 
-        public Vector2 BottomLeft { get; set; } = new Vector2
+        public Vector2Data BottomLeft { get; set; } = new Vector2Data
         {
             X = -1,
             Y = -1,
         };
 
-        public Vector2 BottomRight { get; set; } = new Vector2
+        public Vector2Data BottomRight { get; set; } = new Vector2Data
         {
             X = 1,
             Y = -1
@@ -43,12 +43,12 @@ namespace emt_sdk.Settings.IPW
             {
                 TopLeft = TopLeft,
                 TopRight = TopRight,
-                BottomLeft = new Vector2
+                BottomLeft = new Vector2Data
                 {
                     X = TopLeft.X,
                     Y = BottomLeft.Y
                 },
-                BottomRight = new Vector2
+                BottomRight = new Vector2Data
                 {
                     X = TopRight.X,
                     Y = BottomRight.Y

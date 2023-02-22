@@ -1,4 +1,4 @@
-namespace emt_sdk.Events
+namespace emt_sdk.Events.Effect
 {
     public class EffectCall
     {

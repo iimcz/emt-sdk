@@ -28,7 +28,7 @@ namespace emt_sdk.Events.Relay
         /// <summary>
         /// Called whenever a <see cref="SensorMessage"/> is received from relay server
         /// </summary>
-        public event SensorMessageHandler OnEventReceived;
+        public event SensorDataMessageHandler OnEventReceived;
 
         private NetworkStream _stream;
 
@@ -53,8 +53,8 @@ namespace emt_sdk.Events.Relay
 
                     while (!TokenSource.Token.IsCancellationRequested)
                     {
-                        var sensorEvent = SensorMessage.Parser.ParseDelimitedFrom(_stream);
-                        if (sensorEvent.DataCase == SensorMessage.DataOneofCase.None) continue;
+                        var sensorEvent = SensorDataMessage.Parser.ParseDelimitedFrom(_stream);
+                        if (sensorEvent.DataCase == SensorDataMessage.DataOneofCase.None) continue;
                         OnEventReceived?.Invoke(sensorEvent);
                     }
                 }
@@ -99,10 +99,10 @@ namespace emt_sdk.Events.Relay
         {
             var message = new SensorMessage
             {
-                Event = new EventData
+                Data = new SensorDataMessage
                 {
-                    Name = name,
-                    Parameters = parameters
+                    Path = name,
+                    String = parameters
                 }
             };
 

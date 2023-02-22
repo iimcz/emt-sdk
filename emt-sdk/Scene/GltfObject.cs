@@ -40,7 +40,7 @@ namespace emt_sdk.Scene
             /// <summary>
             /// Offset coordinates in model space relative to <see cref="ObjectName"/> or scene root if it is <see langword="null"/>.
             /// </summary>
-            public Vector3 Offset { get; set; } = new Vector3();
+            public Vector3Data Offset { get; set; } = new Vector3Data();
         }
         
         /// <summary>

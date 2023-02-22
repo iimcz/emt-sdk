@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using Naki3D.Common.Protocol;
 
-namespace emt_sdk.Generated.ScenePackage
+namespace emt_sdk.Events.Effect
 {
-    public partial class Action
+    public class Action
     {
+        // TODO: Just commented out so the project compiles for now
+        /*
         public double? MapValue(SensorMessage message)
         {
             if (!ShouldExecute(message)) return null;
@@ -130,5 +132,6 @@ namespace emt_sdk.Generated.ScenePackage
             
             return val;
         }
+        */
     }
 }

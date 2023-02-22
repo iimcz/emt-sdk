@@ -30,6 +30,12 @@ namespace emt_sdk.Events.Relay
         public CancellationTokenSource TokenSource;
 
         private NetworkStream _stream;
+        private EventManager _eventManager;
+
+        public EventRelayServer(EventManager eventManager)
+        {
+            _eventManager = eventManager;
+        }
 
         /// <summary>
         /// Starts listening on <paramref name="port"/> on the loopback interface.
@@ -42,7 +48,7 @@ namespace emt_sdk.Events.Relay
             var listener = new TcpListener(System.Net.IPAddress.Loopback, port);
 
             listener.Start();
-            EventManager.Instance.OnEventReceived += OnEventReceived;
+            _eventManager.OnEventReceived += OnEventReceived;
             Logger.Info($"Listening for relay messages on port {port}");
 
             TokenSource = new CancellationTokenSource();
@@ -62,9 +68,9 @@ namespace emt_sdk.Events.Relay
                         {
                             while (!TokenSource.Token.IsCancellationRequested)
                             {
-                                var sensorEvent = SensorMessage.Parser.ParseDelimitedFrom(_stream);
-                                if (sensorEvent.DataCase == SensorMessage.DataOneofCase.None) continue;
-                                EventManager.Instance.HandleLocalMessage(sensorEvent);
+                                var sensorEvent = SensorDataMessage.Parser.ParseDelimitedFrom(_stream);
+                                if (sensorEvent.DataCase == SensorDataMessage.DataOneofCase.None) continue;
+                                _eventManager.HandleLocalMessage(sensorEvent);
                             }
                         }
                         catch (InvalidProtocolBufferException e)
@@ -89,7 +95,7 @@ namespace emt_sdk.Events.Relay
                 finally
                 {
                     if (listener.Server.IsBound) listener.Stop();
-                    EventManager.Instance.OnEventReceived -= OnEventReceived;
+                    _eventManager.OnEventReceived -= OnEventReceived;
                     IsConnected = false;
                 }
             }
@@ -102,7 +108,7 @@ namespace emt_sdk.Events.Relay
         /// <exception cref="ArgumentNullException">Thrown when passed event is null</exception>
         /// <exception cref="InvalidOperationException">Thrown when server is not connected</exception>
         /// <param name="message">Event to be sent</param>
-        public void RelayLocalEvent(SensorMessage message)
+        public void RelayLocalEvent(SensorDataMessage message)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
 
@@ -116,7 +122,7 @@ namespace emt_sdk.Events.Relay
             message.WriteDelimitedTo(_stream);
         }
 
-        private void OnEventReceived(SensorMessage message)
+        private void OnEventReceived(SensorDataMessage message)
         {
             if (!IsConnected)
             {

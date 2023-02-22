@@ -1,5 +1,8 @@
-﻿using System;
+﻿using System.Net;
 using System.Threading.Tasks;
+using emt_sdk.Events.Local;
+using emt_sdk.Settings;
+using emt_sdk.Settings.EMT;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Naki3D.Common.Protocol;
@@ -11,17 +14,29 @@ namespace emt_sdk.Communication.Exhibit
         public delegate void VolumeChangeHandler(float volume);
         public event VolumeChangeHandler OnVolumeChanged;
 
-        private readonly ISensorService _sensor;
+        private readonly ISensorManager _sensorManager;
+        private readonly IConfigurationProvider<EMTSetting> _config;
 
-        public DeviceService(ISensorService sensor)
+        public DeviceService(ISensorManager sensorManager, IConfigurationProvider<EMTSetting> config)
 		{
-            _sensor = sensor;
-		}
+            _sensorManager = sensorManager;
+            _config = config;
+        }
 
         public override Task<DeviceDescriptorResponse> GetDeviceDescriptor(Empty request, ServerCallContext context)
         {
-            // TODO: Sensor integration
-            throw new NotImplementedException();
+            var response = new DeviceDescriptorResponse
+            {
+                DeviceType = _config.Configuration.Type.ToString(),
+                Hostname = Dns.GetHostName(),
+                ProtocolVersion = 2,
+                FirmwareVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()
+            };
+
+            var sensorEndpoints = _sensorManager.GetSensorEndpoints();
+            response.AvailableSensors.AddRange(sensorEndpoints);
+
+            return Task.FromResult(response);
         }
 
         public override Task<Empty> SetVolume(FloatValue request, ServerCallContext context)

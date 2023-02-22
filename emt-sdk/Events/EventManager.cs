@@ -1,6 +1,8 @@
-﻿using emt_sdk.Events.Local;
+﻿using emt_sdk.Events.Effect;
+using emt_sdk.Events.Local;
 using emt_sdk.Events.Remote;
 using emt_sdk.Generated.ScenePackage;
+using emt_sdk.Settings;
 using emt_sdk.Settings.EMT;
 using Naki3D.Common.Protocol;
 using NLog;
@@ -9,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Action = emt_sdk.Generated.ScenePackage.Action;
 
 namespace emt_sdk.Events
 {
@@ -21,7 +22,7 @@ namespace emt_sdk.Events
         /// Handler for processing sensor data
         /// </summary>
         /// <param name="message"></param>
-        public delegate void SensorMessageHandler(SensorMessage message);
+        public delegate void SensorDataMessageHandler(SensorDataMessage message);
 
         /// <summary>
         /// Handler for executing effects
@@ -31,21 +32,27 @@ namespace emt_sdk.Events
         /// <summary>
         /// Called whenever an event is received either locally, from other device or from a relay
         /// </summary>
-        public event SensorMessageHandler OnEventReceived;
+        public event SensorDataMessageHandler OnEventReceived;
 
         /// <summary>
         /// Called whenever an effect is executed
         /// </summary>
         public event EffectHandler OnEffectCalled;
 
-        // Singleton
-        public static EventManager Instance { get; } = new EventManager();
-        private EventManager() { }
+        private readonly InterdeviceEventRelay _interdeviceEventRelay;
+        private readonly OutgoingEventConnection _outgoingEventConnection;
 
-        private InterdeviceEventRelay _interdeviceEventRelay;
-        private OutgoingEventConnection _outgoingEventConnection;
+        private readonly ISensorManager _sensorManager;
+        private readonly IConfigurationProvider<EMTSetting> _config;
 
-        public SensorManager SensorManager { get; private set; }
+        public EventManager(ISensorManager sensorManager, IConfigurationProvider<EMTSetting> config, InterdeviceEventRelay interdeviceEventRelay, OutgoingEventConnection outgoingEventConnection)
+        {
+            _sensorManager = sensorManager;
+            _config = config;
+            _interdeviceEventRelay = interdeviceEventRelay;
+            _outgoingEventConnection = outgoingEventConnection;
+        }
+
         public InterdeviceEventRelay InterdeviceEventRelay
         {
             get
@@ -69,40 +76,31 @@ namespace emt_sdk.Events
 
         public bool IsInterdeviceRelay { get; private set; }
         public bool ConnectedRemote { get; private set; } = false;
-        public List<Action> Actions { get; } = new List<Action>();
+        public List<Effect.Action> Actions { get; } = new List<Effect.Action>();
 
         private bool _logEvents = false;
 
         /// <summary>
         /// Hosts a local sensor server. This method will not block the current thread.
         /// </summary>
-        /// <param name="settings"></param>
         /// <exception cref="InvalidOperationException"></exception>
-        public void ConnectSensor(CommunicationSettings settings)
+        public void ConnectSensor()
         {
-            if (SensorManager != null)
-            {
-                Logger.Error("Attempted to connect to sensors more than once");
-                throw new InvalidOperationException("EventManager is already connected to sensors");
-            }
-
-            _logEvents = settings.LogEvents;
+            _logEvents = _config.Configuration.Communication.LogEvents;
             if (_logEvents) Logger.Debug("Sensor event logging is enabled");
 
-            SensorManager = new SensorManager(settings);
-            SensorManager.OnMessage += HandleMessage;
-            SensorManager.OnMessage += HandleLocalMessage;
+            _sensorManager.OnMessage += HandleMessage;
+            _sensorManager.OnMessage += HandleLocalMessage;
 
-            Task.Run(() => SensorManager.Start());
+            Task.Run(() => _sensorManager.Start());
         }
 
         /// <summary>
         /// Connects to remote interdevice relay or hosts one depending on <paramref name="sync"/>. This method will not block the current thread.
         /// </summary>
         /// <param name="sync">emt_sdk device information</param>
-        /// <param name="settings">Network settings</param>
         /// <exception cref="InvalidOperationException"></exception>
-        public void ConnectRemote(Sync sync, CommunicationSettings settings)
+        public void ConnectRemote(Sync sync)
         {
             if (_interdeviceEventRelay != null || _outgoingEventConnection != null)
             {
@@ -112,6 +110,7 @@ namespace emt_sdk.Events
 
             ConnectedRemote = true;
 
+            // TODO: Add new JSON
             // Check whether we're hosting
             var selfIndex = sync.Elements
                 .FirstOrDefault(e => e.Hostname.ToLowerInvariant() == Dns.GetHostName().ToLowerInvariant());
@@ -126,7 +125,6 @@ namespace emt_sdk.Events
                 IsInterdeviceRelay = true;
 
                 Logger.Info($"Device is first in Sync.Elements, starting InterdeviceEventRelay");
-                _interdeviceEventRelay = new InterdeviceEventRelay(settings);
                 _interdeviceEventRelay.OnMessage += HandleMessage;
 
                 Task.Run(() => _interdeviceEventRelay.Start());
@@ -136,14 +134,13 @@ namespace emt_sdk.Events
                 IsInterdeviceRelay = false;
 
                 Logger.Info($"Device is secondary in Sync.Elements, starting OutgoingEventConnection");
-                _outgoingEventConnection = new OutgoingEventConnection(sync, settings);
                 _outgoingEventConnection.OnMessage += HandleMessage;
 
                 Task.Run(() => _outgoingEventConnection.Connect());
             }
         }
 
-        public void BroadcastEvent(SensorMessage message)
+        public void BroadcastEvent(SensorDataMessage message)
         {
             if (!ConnectedRemote) {
                 // This is not an error here, it just means we're operating alone.
@@ -155,12 +152,14 @@ namespace emt_sdk.Events
             else OutgoingEventConnection.SendEvent(message);
         }
 
-        private void HandleMessage(SensorMessage message)
+        private void HandleMessage(SensorDataMessage message)
         {
             if (_logEvents) Logger.Debug(message);
 
             OnEventReceived?.Invoke(message);
 
+            // TODO: More effect stuff
+            /*
             var raisedEffects = Actions
                 .Where(a => a.ShouldExecute(message))
                 .Select(a => new EffectCall
@@ -174,12 +173,13 @@ namespace emt_sdk.Events
                 Logger.Debug($"Executing effect '{raisedEffect.Name}'");
                 OnEffectCalled?.Invoke(raisedEffect);
             }
+            */
         }
 
-        public void HandleLocalMessage(SensorMessage message)
+        public void HandleLocalMessage(SensorDataMessage message)
         {
             // Relay all local events
-            message.SensorId = $"/{Dns.GetHostName()}/{message.SensorId}";
+            message.Path = $"/{Dns.GetHostName()}/{message.Path}";
             BroadcastEvent(message);
         }
     }

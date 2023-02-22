@@ -1,4 +1,5 @@
 ﻿using emt_sdk.Communication.Protobuf;
+using emt_sdk.Settings;
 using emt_sdk.Settings.EMT;
 using Google.Protobuf;
 using Naki3D.Common.Protocol;
@@ -8,23 +9,29 @@ using static emt_sdk.Events.EventManager;
 
 namespace emt_sdk.Events.Remote
 {
-    public class InterdeviceEventRelay : ProtobufTcpListener<SensorMessage>
+    public class InterdeviceEventRelay : ProtobufTcpListener<SensorDataMessage>
     {
-        public event SensorMessageHandler OnMessage;
+        public event SensorDataMessageHandler OnMessage;
 
-        public InterdeviceEventRelay(CommunicationSettings settings) : base(IPAddress.Parse(settings.InterdeviceListenIp), settings.InterdeviceListenPort) { }
+        public InterdeviceEventRelay(IConfigurationProvider<EMTSetting> settings) :
+            base(IPAddress.Parse(settings.Configuration.Communication.InterdeviceListenIp), settings.Configuration.Communication.InterdeviceListenPort) { }
 
-        public void BroadcastSensorMessage(SensorMessage message)
+        public void BroadcastSensorMessage(SensorDataMessage message)
         {
             BroadcastMessage(message);
         }
 
-        protected override void HandleMessage(SensorMessage message, NetworkStream stream)
+        protected override void HandleMessage(SensorDataMessage message, NetworkStream stream)
         {
-            if (message.DataCase == SensorMessage.DataOneofCase.Event && message.Event.Name == "ping")
+            // TODO: Do we still need this?
+            if (message.DataCase == SensorDataMessage.DataOneofCase.String && message.String.EndsWith("ping"))
             {
                 // Don't relay pings
-                new SensorMessage{ Event = new EventData { Name = "pong" } }.WriteDelimitedTo(stream);
+                new SensorDataMessage 
+                {
+                    Path = $"{Dns.GetHostName()}/sdk",
+                    String = "pong"
+                }.WriteDelimitedTo(stream);
                 return;
             }
 

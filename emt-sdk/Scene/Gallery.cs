@@ -103,7 +103,7 @@ namespace emt_sdk.Scene
         /// <summary>
         /// Percentage of screen space along the edges used as padding from 0.0 to 1.0 (e.g. (0.2, 0.1) would be 20% horizontally and 10% vertically).
         /// </summary>
-        public Vector2 Padding { get; set; }
+        public Vector2Data Padding { get; set; }
 
         // TODO: Mention in docs that different animation could be added, also mention custom animations
         /// <summary>

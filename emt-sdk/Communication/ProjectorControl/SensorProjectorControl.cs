@@ -7,9 +7,9 @@ namespace emt_sdk.Communication.ProjectorControl
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        private readonly SensorManager _sensorManager;
+        private readonly ISensorManager _sensorManager;
 
-        public SensorProjectorControl(SensorManager sensorManager)
+        public SensorProjectorControl(ISensorManager sensorManager)
         {
             _sensorManager = sensorManager;
         }

@@ -1,19 +1,10 @@
-﻿using emt_sdk.Communication;
-using emt_sdk.ScenePackage;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Sockets;
-using emt_sdk.Extensions;
 using System.Threading.Tasks;
-using emt_sdk.Scene;
 using Naki3D.Common.Protocol;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using emt_sdk.Generated.ScenePackage;
-using emt_sdk.Settings;
 using Action = emt_sdk.Generated.ScenePackage.Action;
-using emt_sdk.Events.Local;
 using emt_sdk.Events.Relay;
 using emt_sdk.Events;
 using NLog;
@@ -24,6 +15,7 @@ namespace emt_sdk_poc
     {
         protected static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
+        /*
         static async Task ContentManager()
         {
             var settings = new CommunicationSettings
@@ -184,7 +176,7 @@ namespace emt_sdk_poc
                     }
             }
         }
-
+        */
         static async Task Main(string[] args)
         {
             Logger.Info("Testing NLog output");
@@ -194,7 +186,7 @@ namespace emt_sdk_poc
             //Task.Run(ContentManager);
 
             //Task.Run(EventServer);
-            await Relay();
+            //await Relay();
 
             /*
             while (true)
@@ -213,8 +205,8 @@ namespace emt_sdk_poc
             }
             */
 
-            Console.WriteLine("End of POC");
-            Console.ReadLine();
+            //Console.WriteLine("End of POC");
+            //Console.ReadLine();
         }
     }
 }
