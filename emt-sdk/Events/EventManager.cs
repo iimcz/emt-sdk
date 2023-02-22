@@ -76,7 +76,7 @@ namespace emt_sdk.Events
 
         public bool IsInterdeviceRelay { get; private set; }
         public bool ConnectedRemote { get; private set; } = false;
-        public List<Effect.Action> Actions { get; } = new List<Effect.Action>();
+        public List<Packages.Action> Actions { get; } = new List<Packages.Action>();
 
         private bool _logEvents = false;
 
@@ -158,22 +158,15 @@ namespace emt_sdk.Events
 
             OnEventReceived?.Invoke(message);
 
-            // TODO: More effect stuff
-            /*
             var raisedEffects = Actions
                 .Where(a => a.ShouldExecute(message))
-                .Select(a => new EffectCall
-                {
-                    Name = a.Effect,
-                    Value = a.MapValue(message)
-                });
+                .Select(a => a.Transform(message));
 
             foreach (var raisedEffect in raisedEffects)
             {
                 Logger.Debug($"Executing effect '{raisedEffect.Name}'");
                 OnEffectCalled?.Invoke(raisedEffect);
             }
-            */
         }
 
         public void HandleLocalMessage(SensorDataMessage message)
