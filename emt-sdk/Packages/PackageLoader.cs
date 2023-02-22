@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using emt_sdk.Generated.ScenePackage;
 
 namespace emt_sdk.Packages
 {

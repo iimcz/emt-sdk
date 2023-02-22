@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace emt_sdk.Generated.ScenePackage
+namespace emt_sdk.Packages
 {
     public partial class Element
     {

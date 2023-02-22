@@ -107,4 +107,12 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Generated\" />
+  </ItemGroup>
+
+  <Target Name="Quicktype">
+    <Exec Command="quicktype --lang cs --src-lang schema --out Generated/PackageDescriptor.cs --array-type list --namespace emt_sdk.Packages ../emt-common/json/package-schema.json" />
+  </Target>
+
 </Project>

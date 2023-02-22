@@ -1,5 +1,5 @@
 ﻿using emt_sdk.Communication.Protobuf;
-using emt_sdk.Generated.ScenePackage;
+using emt_sdk.Packages;
 using emt_sdk.Settings;
 using emt_sdk.Settings.EMT;
 using Google.Protobuf;

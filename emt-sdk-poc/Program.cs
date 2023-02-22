@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Naki3D.Common.Protocol;
-using emt_sdk.Generated.ScenePackage;
-using Action = emt_sdk.Generated.ScenePackage.Action;
 using emt_sdk.Events.Relay;
 using emt_sdk.Events;
 using NLog;

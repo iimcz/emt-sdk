@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace emt_sdk.Generated.ScenePackage
+namespace emt_sdk.Packages
 {
     /// <summary>
     /// Implementation of <see cref="PackageDescriptor"/> logic.
@@ -38,7 +38,7 @@ namespace emt_sdk.Generated.ScenePackage
                 return;
             }
 
-            Logger.Info($"Downloading package '{Metadata.PackageName}' / '{Metadata.Id}' from '{Package.Url}'");
+            Logger.Info($"Downloading package '{Metadata.Title}' / '{Metadata.Id}' from '{Package.Url}'");
             using (var client = new WebClient()) client.DownloadFile(Package.Url, ArchivePath);
             Logger.Info($"Download complete");
 
