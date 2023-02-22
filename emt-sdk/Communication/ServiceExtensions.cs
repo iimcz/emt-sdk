@@ -36,6 +36,7 @@ namespace emt_sdk.Communication
         {
             services.AddScoped<ConnectionService.ConnectionServiceBase, Exhibit.ConnectionService>();
             services.AddScoped<DeviceService.DeviceServiceBase, Exhibit.DeviceService>();
+            services.AddScoped<Exhibit.GrpcServer>();
         }
     }
 }
