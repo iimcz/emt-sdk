@@ -59,9 +59,8 @@ namespace emt_sdk.Scene
             public GltfLocation Location { get; set; }
 
             /// <summary>
-            /// Displayed text
+            /// Displayed text, can be formatted according to http://digitalnativestudios.com/textmeshpro/docs/rich-text/
             /// </summary>
-            // TODO: Add link to tmpro
             public string Text { get; set; }
 
             /// <summary>
