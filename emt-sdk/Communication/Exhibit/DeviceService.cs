@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using emt_sdk.Device;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Naki3D.Common.Protocol;
@@ -9,11 +8,14 @@ namespace emt_sdk.Communication.Exhibit
 {
 	public class DeviceService : Naki3D.Common.Protocol.DeviceService.DeviceServiceBase
 	{
-        private readonly IDeviceManagementService _deviceManagement;
+        public delegate void VolumeChangeHandler(float volume);
+        public event VolumeChangeHandler OnVolumeChanged;
 
-        public DeviceService(IDeviceManagementService deviceManagement)//, ISensorService sensor)
+        private readonly ISensorService _sensor;
+
+        public DeviceService(ISensorService sensor)
 		{
-            _deviceManagement = deviceManagement;
+            _sensor = sensor;
 		}
 
         public override Task<DeviceDescriptorResponse> GetDeviceDescriptor(Empty request, ServerCallContext context)
@@ -22,15 +24,9 @@ namespace emt_sdk.Communication.Exhibit
             throw new NotImplementedException();
         }
 
-        public override Task<Empty> RebootDevice(Empty request, ServerCallContext context)
+        public override Task<Empty> SetVolume(FloatValue request, ServerCallContext context)
         {
-            _deviceManagement.Reboot();
-            return Task.FromResult(new Empty());
-        }
-
-        public override Task<Empty> ShutdownDevice(Empty request, ServerCallContext context)
-        {
-            _deviceManagement.Shutdown();
+            OnVolumeChanged?.Invoke(request.Value);
             return Task.FromResult(new Empty());
         }
     }

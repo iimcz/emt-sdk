@@ -13,7 +13,6 @@ namespace emt_sdk.Communication.Protobuf
     {
         protected readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        // TODO: Changing timeout at runtime? Probably don't need it
         public int Timeout { get; set; }
 
         protected CancellationTokenSource _tokenSource = new CancellationTokenSource();

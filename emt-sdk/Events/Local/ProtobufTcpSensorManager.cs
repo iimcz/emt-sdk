@@ -7,6 +7,7 @@ using static emt_sdk.Events.EventManager;
 using emt_sdk.Settings.EMT;
 using emt_sdk.Settings;
 using emt_sdk.Communication.Protobuf;
+using System.Collections.Generic;
 
 namespace emt_sdk.Events.Local
 {
@@ -28,20 +29,14 @@ namespace emt_sdk.Events.Local
             }
         }
 
-        protected override void HandleConnection((TcpClient tcpClient, NetworkStream stream) clientInfo, CancellationToken cancellationToken)
-        {
-            // TODO: Sometimes we can have a non-sensor based approach!
-            // Ideally the event of getting a new sensor shouldn't automatically trigger a CEC power on
-
-            // Attempt to power on a projector (other sensors ignore this message)
-            // ProjectorControl.PowerOn();
-
-            base.HandleConnection(clientInfo, cancellationToken);
-        }
-
         protected override void HandleMessage(SensorMessage message, NetworkStream stream)
         {
             OnMessage?.Invoke(message);
+        }
+
+        public List<SensorDescriptor> GetSensorEndpoints(string filter = "")
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
