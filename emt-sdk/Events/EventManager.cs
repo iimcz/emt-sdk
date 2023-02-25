@@ -160,7 +160,8 @@ namespace emt_sdk.Events
 
             var raisedEffects = Actions
                 .Where(a => a.ShouldExecute(message))
-                .Select(a => a.Transform(message));
+                .Select(a => a.Transform(message))
+                .Where(ec => ec != null); // Filter out failed ifs
 
             foreach (var raisedEffect in raisedEffects)
             {
