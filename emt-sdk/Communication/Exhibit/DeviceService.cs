@@ -11,9 +11,6 @@ namespace emt_sdk.Communication.Exhibit
 {
 	public class DeviceService : Naki3D.Common.Protocol.DeviceService.DeviceServiceBase
 	{
-        public delegate void VolumeChangeHandler(float volume);
-        public event VolumeChangeHandler OnVolumeChanged;
-
         private readonly ISensorManager _sensorManager;
         private readonly IConfigurationProvider<EMTSetting> _config;
 
@@ -41,7 +38,7 @@ namespace emt_sdk.Communication.Exhibit
 
         public override Task<Empty> SetVolume(FloatValue request, ServerCallContext context)
         {
-            OnVolumeChanged?.Invoke(request.Value);
+            OnVolumeChanged(request.Value);
             return Task.FromResult(new Empty());
         }
     }
