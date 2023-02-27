@@ -9,7 +9,9 @@
 
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.21.12" />
-    <PackageReference Include="Grpc.Core" Version="2.46.6" />
+    <PackageReference Include="Grpc.Core" Version="2.46.6">
+      <IncludeAssets>compile; runtime;</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Grpc.Tools" Version="2.51.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -27,82 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="emt-common\json\package-schema.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="UnityPackage\package\package.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\package.json.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\emt-sdk.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\Google.Protobuf.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\Microsoft.CodeAnalysis.CSharp.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\Microsoft.CodeAnalysis.CSharp.Scripting.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\Microsoft.CodeAnalysis.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\Microsoft.CodeAnalysis.Scripting.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\Newtonsoft.Json.Schema.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\NLog.config.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\NLog.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\System.Buffers.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\System.Collections.Immutable.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\System.Memory.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\System.Numerics.Vectors.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\System.Reflection.Metadata.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\System.Reflection.TypeExtensions.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\System.Runtime.CompilerServices.Unsafe.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\System.Runtime.Loader.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\System.Runtime.Loader.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\System.Text.Encoding.CodePages.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\System.Threading.Tasks.Extensions.dll.meta">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="UnityPackage\package\Runtime\Yort.Ntp.dll.meta">
+    <None Update="UnityPackage\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -113,6 +43,10 @@
 
   <Target Name="Quicktype">
     <Exec Command="quicktype --lang cs --src-lang schema --out Generated/PackageDescriptor.cs --array-type list --namespace emt_sdk.Packages ../emt-common/json/package-schema.json" />
+  </Target>
+
+  <Target Name="UnityPackage">
+    <!-- TODO: copy emt-common/json/package-schema.json, libgrpc_csharp_ext.so and relevant C# dll files to the UnityPackage output directory -->
   </Target>
 
 </Project>

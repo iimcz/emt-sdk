@@ -16,8 +16,9 @@ namespace emt_sdk.Packages
         private readonly JsonSerializer _jsonSerializer = JsonSerializer.Create(Converter.Settings);
         private readonly JSchema _schema;
 
-        public PackageLoader(string schema = SCHEMA_PATH)
+        public PackageLoader(/*string schema = SCHEMA_PATH*/)
         {
+            string schema = null; // TODO: use either a resource or a properly injected schema
             if (schema == null)
             {
                 Logger.Warn("Creating PackageLoader without any schema!");

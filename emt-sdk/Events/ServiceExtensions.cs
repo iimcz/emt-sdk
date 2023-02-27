@@ -38,9 +38,10 @@ namespace emt_sdk.Events
             // Remote
             services.AddSingleton<InterdeviceEventRelay>();
             services.AddSingleton<EventRelayServer>();
+            services.AddScoped<OutgoingEventConnection>();
 
             // Main manager
-            services.AddSingleton<EventManager>();
+            services.AddScoped<EventManager>();
         }
     }
 }

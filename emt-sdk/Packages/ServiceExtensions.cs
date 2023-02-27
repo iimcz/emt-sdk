@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using emt_sdk.Settings;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace emt_sdk.Packages
 {
@@ -15,6 +16,16 @@ namespace emt_sdk.Packages
         {
             services.AddScoped<PackageLoader>();
             services.AddScoped<Naki3D.Common.Protocol.PackageService.PackageServiceBase, PackageService>();
+        }
+
+        public static void AddPackageRunnerProxy(this IServiceCollection services)
+        {
+            services.AddScoped<IPackageRunner, PackageRunnerProxy>();
+        }
+
+        public static void AddSyncConfiguration(this IServiceCollection services)
+        {
+            services.AddSingleton<IConfigurationProvider<PackageDescriptor>, PackageDescriptorProvider>();
         }
     }
 }

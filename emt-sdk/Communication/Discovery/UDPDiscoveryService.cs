@@ -29,7 +29,7 @@ namespace emt_sdk.Communication.Discovery
         {
             _emtSetting = emtSetting;
 
-            _udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, DISCOVERY_PORT));
+            _udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, 0));
             _beacon = SerializeBeacon();
             _broadcastTimer.Elapsed += (sender, args) => Broadcast();
         }

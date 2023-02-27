@@ -2,9 +2,9 @@ using emt_sdk.Settings;
 
 namespace emt_sdk.Packages
 {
-    public class SyncProvider : IConfigurationProvider<Sync>
+    public class PackageDescriptorProvider : IConfigurationProvider<PackageDescriptor>
     {
-        public Sync Configuration { get; set; }
+        public PackageDescriptor Configuration { get; set; }
 
         public bool ConfigurationExists => Configuration != null;
 

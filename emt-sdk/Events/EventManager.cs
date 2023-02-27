@@ -44,11 +44,13 @@ namespace emt_sdk.Events
 
         private readonly ISensorManager _sensorManager;
         private readonly IConfigurationProvider<EMTSetting> _config;
+        private readonly IConfigurationProvider<PackageDescriptor> _packageConfig;
 
-        public EventManager(ISensorManager sensorManager, IConfigurationProvider<EMTSetting> config, InterdeviceEventRelay interdeviceEventRelay, OutgoingEventConnection outgoingEventConnection)
+        public EventManager(ISensorManager sensorManager, IConfigurationProvider<EMTSetting> config, IConfigurationProvider<PackageDescriptor> packageConfig, InterdeviceEventRelay interdeviceEventRelay, OutgoingEventConnection outgoingEventConnection)
         {
             _sensorManager = sensorManager;
             _config = config;
+            _packageConfig = packageConfig;
             _interdeviceEventRelay = interdeviceEventRelay;
             _outgoingEventConnection = outgoingEventConnection;
         }
@@ -81,7 +83,7 @@ namespace emt_sdk.Events
         private bool _logEvents = false;
 
         /// <summary>
-        /// Hosts a local sensor server. This method will not block the current thread.
+        /// Subscribes to events of the local sensor server.
         /// </summary>
         /// <exception cref="InvalidOperationException"></exception>
         public void ConnectSensor()
@@ -92,7 +94,8 @@ namespace emt_sdk.Events
             _sensorManager.OnMessage += HandleMessage;
             _sensorManager.OnMessage += HandleLocalMessage;
 
-            Task.Run(() => _sensorManager.Start());
+            // NOTE: this is now done explicitly in the Unity/client application.
+            //Task.Run(() => _sensorManager.Start());
         }
 
         /// <summary>
@@ -100,8 +103,9 @@ namespace emt_sdk.Events
         /// </summary>
         /// <param name="sync">emt_sdk device information</param>
         /// <exception cref="InvalidOperationException"></exception>
-        public void ConnectRemote(Sync sync)
+        public void ConnectRemote()
         {
+            var sync = _packageConfig.Configuration.Sync;
             if (_interdeviceEventRelay != null || _outgoingEventConnection != null)
             {
                 Logger.Error("Attempted to connect to remote more than once");

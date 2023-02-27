@@ -16,5 +16,10 @@ namespace emt_sdk.Events.Local
         /// Starts listening for incoming sensor connections. This call will block the current thread.
         /// </summary>
         void Start();
+
+        /// <summary>
+        /// Stops listening to connections (at some point in the near future) and unblocks the thread blocked by Start.
+        /// </summary>
+        void Stop();
     }
 }

@@ -21,8 +21,8 @@ namespace emt_sdk.Events.Remote
 
         public event SensorDataMessageHandler OnMessage;
 
-        public OutgoingEventConnection(IConfigurationProvider<Sync> sync, IConfigurationProvider<EMTSetting> settings) :
-            base(sync.Configuration.RelayAddress, settings.Configuration.Communication.InterdeviceListenPort) { }
+        public OutgoingEventConnection(IConfigurationProvider<PackageDescriptor> sync, IConfigurationProvider<EMTSetting> settings) :
+            base(sync.Configuration.Sync.RelayAddress, settings.Configuration.Communication.InterdeviceListenPort) { }
 
         /// <summary>
         /// Sends an event to target connected device
