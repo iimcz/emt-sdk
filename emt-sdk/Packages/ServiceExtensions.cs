@@ -20,7 +20,7 @@ namespace emt_sdk.Packages
 
         public static void AddPackageRunnerProxy(this IServiceCollection services)
         {
-            services.AddScoped<IPackageRunner, PackageRunnerProxy>();
+            services.AddSingleton<IPackageRunner, PackageRunnerProxy>();
         }
 
         public static void AddSyncConfiguration(this IServiceCollection services)

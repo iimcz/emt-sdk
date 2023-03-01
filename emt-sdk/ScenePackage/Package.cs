@@ -91,7 +91,7 @@ namespace emt_sdk.Packages
         {
             get
             {
-                return Package.Checksum + ".zip";
+                return Metadata.Id + ".zip";
             }
         }
 

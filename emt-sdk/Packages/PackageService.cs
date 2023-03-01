@@ -27,9 +27,22 @@ namespace emt_sdk.Packages
 
         public override Task<BoolValue> LoadPackage(LoadPackageRequest request, ServerCallContext context)
         {
+            Logger.Info($"Loading a package package (preview: {request.IsPreview})");
+
             // TODO: Preview mode
+            Logger.Debug($"Package descriptor: {request.DescriptorJson}");
             var sr = new StringReader(request.DescriptorJson);
-            var package = _packageLoader.LoadPackage(sr, false);
+            PackageDescriptor package;
+
+            try
+            {
+                package = _packageLoader.LoadPackage(sr, false);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Failed to parse package");
+                return Task.FromResult(new BoolValue { Value = false });
+            }
 
             try
             {
@@ -77,6 +90,7 @@ namespace emt_sdk.Packages
 
         public override Task<BoolValue> SetStartupPackage(SetStartupPackageRequest request, ServerCallContext context)
         {
+            Logger.Info($"Setting startup package to '{request.PackageId}'");
             var package = _packageLoader.FindPackage(request.PackageId, false);
             if (package == null)
             {
@@ -111,6 +125,8 @@ namespace emt_sdk.Packages
                     PackageId = p.Metadata.Id
                 });
 
+            Logger.Info($"Found {packages.Count()} cached packages");
+
             var response = new CachedPackagesResponse();
             response.Packages.AddRange(packages);
             return Task.FromResult(response);
@@ -118,6 +134,7 @@ namespace emt_sdk.Packages
 
         public override Task<BoolValue> StartPackage(StartPackageRequest request, ServerCallContext context)
         {
+            Logger.Info($"Starting package '{request.PackageId}'");
             var package = _packageLoader.FindPackage(request.PackageId, false);
             if (package == null)
             {
@@ -125,7 +142,14 @@ namespace emt_sdk.Packages
                 return Task.FromResult(new BoolValue { Value = false });
             }
 
-            _runner.RunPackage(package);
+            try
+            {
+                _runner.RunPackage(package);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, $"Failed to start package '{request.PackageId}'");
+            }
             return Task.FromResult(new BoolValue { Value = true });
         }
     }

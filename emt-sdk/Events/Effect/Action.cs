@@ -16,7 +16,7 @@ namespace emt_sdk.Packages
         static Action()
         {
             var type = typeof(ITransformation);
-            var types = AppDomain.CurrentDomain.GetAssemblies()
+            var types = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies()
                 .SelectMany(s => s.GetTypes())
                 .Where(p => type.IsAssignableFrom(p) && !p.IsInterface);
 

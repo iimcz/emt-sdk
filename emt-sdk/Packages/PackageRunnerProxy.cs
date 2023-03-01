@@ -8,6 +8,10 @@ namespace emt_sdk.Packages
 
         public void RunPackage(PackageDescriptor package)
         {
+            if (PackageRunAction == null)
+            {
+                throw new InvalidOperationException($"Cannot run a package before a run action is set! {this.GetHashCode()}");
+            }
             PackageRunAction(package);
         }
     }
