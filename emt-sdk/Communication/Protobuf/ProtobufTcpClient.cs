@@ -30,7 +30,6 @@ namespace emt_sdk.Communication.Protobuf
         public ProtobufTcpClient(string hostname, int port)
         {
             Logger = LogManager.GetCurrentClassLogger();
-            if (string.IsNullOrWhiteSpace(hostname)) throw new ArgumentException("Hostname cannot be null or empty", nameof(hostname));
 
             _hostname = hostname;
             _port = port;
@@ -44,6 +43,8 @@ namespace emt_sdk.Communication.Protobuf
         /// </summary>
         public void Connect()
         {
+            if (string.IsNullOrWhiteSpace(_hostname)) throw new ArgumentException("Hostname cannot be null or empty", nameof(_hostname));
+            
             _client?.Dispose();
             _client = new TcpClient
             {

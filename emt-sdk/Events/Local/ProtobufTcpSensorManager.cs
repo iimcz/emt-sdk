@@ -39,6 +39,7 @@ namespace emt_sdk.Events.Local
                     OnMessage?.Invoke(message.Data);
                     break;
                 case SensorMessage.MessageOneofCase.Descriptor_:
+                    Logger.Debug($"Received sensor descriptor: ${message.Descriptor_}");
                     _descriptors[message.Descriptor_.Path] = message.Descriptor_;
                     break;
             }

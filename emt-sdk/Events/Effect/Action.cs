@@ -4,35 +4,40 @@ using System.Linq;
 using emt_sdk.Events.Effect;
 using emt_sdk.Events.Effect.Transformations;
 using Naki3D.Common.Protocol;
+using NLog;
 
 namespace emt_sdk.Packages
 {
     public partial class Action
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public bool ShouldExecute(SensorDataMessage message) => message.Path == Mapping.Source;
 
-        private static readonly List<ITransformation> _transformations = new List<ITransformation>();
-
-        static Action()
-        {
-            var type = typeof(ITransformation);
-            var types = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => type.IsAssignableFrom(p) && !p.IsInterface);
-
-            foreach (var transformationType in types)
-            {
-                var instance = Activator.CreateInstance(transformationType) as ITransformation;
-                _transformations.Add(instance);
-            }
-        }
+        private static List<ITransformation> _transformations = new List<ITransformation>() {
+            new ConstantTransformation(),
+            new DirectTransformation(),
+            new DiscardTransformation(),
+            new IfTransformation(),
+            new MapTransformation(),
+            new NegateTransformation(),
+            new ParseTransformation(),
+            new PassthroughTransformation(),
+            new RoundTransformation(),
+            new ToStringTransformation()
+        };
 
         public EffectCall Transform(SensorDataMessage message)
         {
             var transformationType = Mapping?.Transform?.Type ?? "passthrough";
             var transformation = _transformations.FirstOrDefault(t => t.Name == transformationType);
 
-            if (transformation == null) throw new NotImplementedException($"Unsupported transform operation '{transformationType}'");
+            if (transformation == null)
+            {
+                // TODO: consider if throwing an exception was better
+                //throw new NotImplementedException($"Unsupported transform operation '{transformationType}'");
+                Logger.Warn($"Unsupported transform operation requested: '{transformationType}'");
+                return null;
+            }
             return transformation.Transform(this, message);
         }
 

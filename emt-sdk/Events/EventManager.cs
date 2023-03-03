@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace emt_sdk.Events
 {
-    public class EventManager
+    public class EventManager : IDisposable
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -45,6 +45,8 @@ namespace emt_sdk.Events
         private readonly ISensorManager _sensorManager;
         private readonly IConfigurationProvider<EMTSetting> _config;
         private readonly IConfigurationProvider<PackageDescriptor> _packageConfig;
+
+        private bool _isHosting = false;
 
         public EventManager(ISensorManager sensorManager, IConfigurationProvider<EMTSetting> config, IConfigurationProvider<PackageDescriptor> packageConfig, InterdeviceEventRelay interdeviceEventRelay, OutgoingEventConnection outgoingEventConnection)
         {
@@ -81,6 +83,7 @@ namespace emt_sdk.Events
         public List<Packages.Action> Actions { get; } = new List<Packages.Action>();
 
         private bool _logEvents = false;
+        private Task _relayTask;
 
         /// <summary>
         /// Subscribes to events of the local sensor server.
@@ -105,8 +108,12 @@ namespace emt_sdk.Events
         /// <exception cref="InvalidOperationException"></exception>
         public void ConnectRemote()
         {
-            var sync = _packageConfig.Configuration.Sync;
-            if (_interdeviceEventRelay != null || _outgoingEventConnection != null)
+            if (string.IsNullOrWhiteSpace(_packageConfig.Configuration.Sync.RelayAddress))
+            {
+                Logger.Info("Sync is missing a relay - not starting.");
+                return;
+            }
+            if (ConnectedRemote)
             {
                 Logger.Error("Attempted to connect to remote more than once");
                 throw new InvalidOperationException("EventManager is already connected to remote");
@@ -114,33 +121,25 @@ namespace emt_sdk.Events
 
             ConnectedRemote = true;
 
-            // TODO: Add new JSON
             // Check whether we're hosting
-            var selfIndex = sync.Elements
-                .FirstOrDefault(e => e.Hostname.ToLowerInvariant() == Dns.GetHostName().ToLowerInvariant());
-
-            if (selfIndex == null)
-            {
-                Logger.Error($"Could not find current hostname ({Dns.GetHostName()}) in sync data! Assuming this isn't host!");
-            }
-
-            if (selfIndex == sync.Elements.First())
+            _isHosting = _config.Configuration.Communication.InterdeviceListenIp == _packageConfig.Configuration.Sync.RelayAddress;
+            if (_isHosting)
             {
                 IsInterdeviceRelay = true;
 
-                Logger.Info($"Device is first in Sync.Elements, starting InterdeviceEventRelay");
+                Logger.Info($"Interdevice listen IP matches package RelayAddress - this is the relay host");
                 _interdeviceEventRelay.OnMessage += HandleMessage;
 
-                Task.Run(() => _interdeviceEventRelay.Start());
+                _relayTask = Task.Run(() => _interdeviceEventRelay.Start());
             }
             else
             {
                 IsInterdeviceRelay = false;
 
-                Logger.Info($"Device is secondary in Sync.Elements, starting OutgoingEventConnection");
+                Logger.Info($"Interdevice listen IP differs from package RelayAddress - this is a client");
                 _outgoingEventConnection.OnMessage += HandleMessage;
 
-                Task.Run(() => _outgoingEventConnection.Connect());
+                _relayTask = Task.Run(() => _outgoingEventConnection.Connect());
             }
         }
 
@@ -148,7 +147,7 @@ namespace emt_sdk.Events
         {
             if (!ConnectedRemote) {
                 // This is not an error here, it just means we're operating alone.
-                Logger.Debug("EventManager is not connected to remote");
+                //Logger.Debug("EventManager is not connected to remote");
                 return;
             }
 
@@ -169,8 +168,26 @@ namespace emt_sdk.Events
 
             foreach (var raisedEffect in raisedEffects)
             {
-                Logger.Debug($"Executing effect '{raisedEffect.Name}'");
+                if (ShouldReport(raisedEffect.DataType))
+                {
+                    Logger.Debug($"Executing effect '{raisedEffect.Name}'");
+                }
                 OnEffectCalled?.Invoke(raisedEffect);
+            }
+        }
+
+        private bool ShouldReport(DataType dataType)
+        {
+            switch (dataType)
+            {
+                case DataType.Void:
+                case DataType.Bool:
+                case DataType.Integer:
+                case DataType.Float:
+                case DataType.String:
+                    return true;
+                default:
+                    return false;
             }
         }
 
@@ -179,6 +196,29 @@ namespace emt_sdk.Events
             // Relay all local events
             message.Path = $"/{Dns.GetHostName()}/{message.Path}";
             BroadcastEvent(message);
+        }
+
+        public void Dispose()
+        {
+            _sensorManager.OnMessage -= HandleLocalMessage;
+            _sensorManager.OnMessage -= HandleMessage;
+
+            if (ConnectedRemote)
+            {
+                if (_isHosting)
+                {
+                    _interdeviceEventRelay.OnMessage -= HandleMessage;
+                    _interdeviceEventRelay.Stop();
+                }
+                else
+                {
+                    _outgoingEventConnection.OnMessage -= HandleMessage;
+                    _outgoingEventConnection.Disconnect();
+                }
+
+                // 2 second timeout 
+                _relayTask.Wait(TimeSpan.FromSeconds(2));
+            }
         }
     }
 }
