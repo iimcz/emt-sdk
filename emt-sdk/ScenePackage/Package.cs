@@ -59,6 +59,11 @@ namespace emt_sdk.Packages
                 zip.ExtractToDirectory(PackageDirectory);
             }
 
+            // Rename archive package.json so it can be replaced with exposition one
+            var jsonPath = Path.Combine(PackageDirectory, "package.json");
+            var jsonPathOld = Path.Combine(PackageDirectory, "package.json.old");
+            File.Move(jsonPath, jsonPathOld);
+
             Logger.Info($"Extracted package to '{ArchivePath}'");
         }
 

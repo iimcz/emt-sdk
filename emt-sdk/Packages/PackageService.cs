@@ -3,6 +3,7 @@ using emt_sdk.Settings.EMT;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Naki3D.Common.Protocol;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
@@ -47,6 +48,11 @@ namespace emt_sdk.Packages
             try
             {
                 package.DownloadFile();
+
+                // Replace archive package.json with exposition version
+                var expositionJson = JsonConvert.SerializeObject(package);
+                var expositionJsonPath = Path.Combine(package.PackageDirectory, "package.json");
+                File.WriteAllText(expositionJsonPath, expositionJson);
             }
             catch (Exception ex)
             {
