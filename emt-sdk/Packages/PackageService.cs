@@ -50,7 +50,7 @@ namespace emt_sdk.Packages
                 package.DownloadFile();
 
                 // Replace archive package.json with exposition version
-                var expositionJson = JsonConvert.SerializeObject(package);
+                var expositionJson = JsonConvert.SerializeObject(package, Converter.Settings);
                 var expositionJsonPath = Path.Combine(package.PackageDirectory, "package.json");
                 File.WriteAllText(expositionJsonPath, expositionJson);
             }
