@@ -6,6 +6,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace emt_sdk.Packages
 {
@@ -92,6 +93,7 @@ namespace emt_sdk.Packages
         /// Gets the archive filename of this package
         /// </summary>
         /// <returns>Package archive filename</returns>
+        [JsonIgnore]
         public string ArchiveFileName
         {
             get
@@ -100,16 +102,19 @@ namespace emt_sdk.Packages
             }
         }
 
+        [JsonIgnore]
         public string ArchivePath => Path.Combine(PackageStore, ArchiveFileName);
 
         /// <summary>
         /// Gets the location of the extracted package
         /// </summary>
+        [JsonIgnore]
         public string PackageDirectory => Path.Combine(PackageStore, Path.GetFileNameWithoutExtension(ArchivePath));
 
         /// <summary>
         /// Gets the location of package resources (video, models, images, etc...)
         /// </summary>
+        [JsonIgnore]
         public string DataRoot => Path.Combine(PackageDirectory, "dataroot");
 
         /// <summary>
