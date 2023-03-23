@@ -25,9 +25,6 @@ namespace emt_sdk.Communication.Exhibit
 
         public override Task<DeviceDescriptorResponse> GetDeviceDescriptor(Empty request, ServerCallContext context)
         {
-            // We can take this as the EMT having accepted this device, so we can disable broadcast.
-            if (_discovery.IsBroadcasting) _discovery.StopBroadcast();
-
             var response = new DeviceDescriptorResponse
             {
                 DeviceType = _config.Configuration.Type.ToString(),
