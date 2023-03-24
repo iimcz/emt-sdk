@@ -32,12 +32,11 @@ namespace emt_sdk.Events
             services.AddSingleton<ISensorManager, ProtobufTcpSensorManager>();
 
             // Relay
-            services.AddSingleton<EventRelayClient>();
-            services.AddSingleton<EventRelayServer>();
+            services.AddScoped<EventRelayClient>();
+            services.AddScoped<EventRelayServer>();
 
             // Remote
             services.AddSingleton<InterdeviceEventRelay>();
-            services.AddSingleton<EventRelayServer>();
             services.AddScoped<OutgoingEventConnection>();
 
             // Main manager
