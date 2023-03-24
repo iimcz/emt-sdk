@@ -77,7 +77,7 @@ namespace emt_sdk.Events.Relay
         /// <exception cref="ArgumentNullException">Thrown when passed event is null</exception>
         /// <exception cref="InvalidOperationException">Thrown when client is not connected</exception>
         /// <param name="message">Event to be sent</param>
-        public void BroadcastEvent(SensorMessage message)
+        public void BroadcastEvent(SensorDataMessage message)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
 
@@ -97,13 +97,10 @@ namespace emt_sdk.Events.Relay
         /// <param name="parameters">Custom event parameters</param>
         public void BroadcastEvent(string name, string parameters)
         {
-            var message = new SensorMessage
+            var message = new SensorDataMessage
             {
-                Data = new SensorDataMessage
-                {
-                    Path = name,
-                    String = parameters
-                }
+                Path = name,
+                String = parameters
             };
 
             BroadcastEvent(message);
