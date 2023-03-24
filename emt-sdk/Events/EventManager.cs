@@ -155,7 +155,7 @@ namespace emt_sdk.Events
             else OutgoingEventConnection.SendEvent(message);
         }
 
-        private void HandleMessage(SensorDataMessage message)
+        public void HandleMessage(SensorDataMessage message)
         {
             if (_logEvents) Logger.Debug(message);
 
