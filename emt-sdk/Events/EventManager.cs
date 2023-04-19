@@ -205,6 +205,7 @@ namespace emt_sdk.Events
 
             if (ConnectedRemote)
             {
+                ConnectedRemote = false;
                 if (_isHosting)
                 {
                     _interdeviceEventRelay.OnMessage -= HandleMessage;
