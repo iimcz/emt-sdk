@@ -115,7 +115,8 @@ namespace emt_sdk.Communication.Protobuf
 
         protected void SendMessage(T message)
         {
-            message.WriteDelimitedTo(_stream);
+            if (!_client.Connected) return;
+                message.WriteDelimitedTo(_stream);
         }
 
         protected abstract void Ping();
