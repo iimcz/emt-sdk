@@ -47,6 +47,7 @@ namespace emt_sdk.Communication.Protobuf
                 {
                     while (true)
                     {
+                        Logger.Info("Listening for protobuf connections.");
                         var client = _listener.AcceptTcpClient();
                         client.ReceiveTimeout = Timeout;
                         client.SendTimeout = Timeout;
@@ -60,7 +61,6 @@ namespace emt_sdk.Communication.Protobuf
                 catch (SocketException e)
                 {
                     Logger.Warn(e, "Exception during listener shutdown");
-                    throw e;
                 }
                 finally
                 {
@@ -73,7 +73,13 @@ namespace emt_sdk.Communication.Protobuf
         public void Stop()
         {
             _tokenSource?.Cancel();
-            lock (_clients) foreach (var (tcpClient, _) in _clients) tcpClient.Dispose();
+            lock (_clients)
+            {
+                foreach (var (tcpClient, _) in _clients) tcpClient.Dispose();
+                _clients.Clear();
+            }
+            _tokenSource?.Dispose();
+            _tokenSource = new CancellationTokenSource();
         }
 
         protected void BroadcastMessage(T message)
