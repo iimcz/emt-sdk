@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.21.12" />
-    <PackageReference Include="Grpc.Core" Version="2.46.6">
+    <PackageReference Include="Grpc.Core" Version="2.46.6" GeneratePathProperty="true">
       <IncludeAssets>compile; runtime;</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Grpc.Tools" Version="2.51.0">
@@ -35,6 +35,9 @@
     <None Update="UnityPackage\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\emt-common\json\package-schema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -45,8 +48,42 @@
     <Exec Command="quicktype --lang cs --src-lang schema --out Generated/PackageDescriptor.cs --array-type list --namespace emt_sdk.Packages ../emt-common/json/package-schema.json" />
   </Target>
 
-  <Target Name="UnityPackage">
-    <!-- TODO: copy emt-common/json/package-schema.json, libgrpc_csharp_ext.so and relevant C# dll files to the UnityPackage output directory -->
+  <ItemGroup>
+    <!-- If we copy any extra DLLs Unity will implode... -->
+    <DistributedDlls Include="$(OutDir)\Google.Protobuf.dll"/>
+    <DistributedDlls Include="$(OutDir)\Grpc.Core.Api.dll"/>
+    <DistributedDlls Include="$(OutDir)\Grpc.Core.dll"/>
+    <DistributedDlls Include="$(OutDir)\Microsoft.Bcl.AsyncInterfaces.dll"/>
+    <DistributedDlls Include="$(OutDir)\Microsoft.CodeAnalysis.CSharp.dll"/>
+    <DistributedDlls Include="$(OutDir)\Microsoft.CodeAnalysis.CSharp.Scripting.dll"/>
+    <DistributedDlls Include="$(OutDir)\Microsoft.CodeAnalysis.dll"/>
+    <DistributedDlls Include="$(OutDir)\Microsoft.CodeAnalysis.Scripting.dll"/>
+    <DistributedDlls Include="$(OutDir)\Microsoft.Extensions.DependencyInjection.Abstractions.dll"/>
+    <DistributedDlls Include="$(OutDir)\Microsoft.Extensions.DependencyInjection.dll"/>
+    <DistributedDlls Include="$(OutDir)\Newtonsoft.Json.Schema.dll"/>
+    <DistributedDlls Include="$(OutDir)\NLog.config"/>
+    <DistributedDlls Include="$(OutDir)\NLog.dll"/>
+    <DistributedDlls Include="$(OutDir)\System.Buffers.dll"/>
+    <DistributedDlls Include="$(OutDir)\System.Collections.Immutable.dll"/>
+    <DistributedDlls Include="$(OutDir)\System.Memory.dll"/>
+    <DistributedDlls Include="$(OutDir)\System.Numerics.Vectors.dll"/>
+    <DistributedDlls Include="$(OutDir)\System.Reflection.Metadata.dll"/>
+    <DistributedDlls Include="$(OutDir)\System.Reflection.TypeExtensions.dll"/>
+    <DistributedDlls Include="$(OutDir)\System.Runtime.CompilerServices.Unsafe.dll"/>
+    <!-- <DistributedDlls Include="$(OutDir)\System.Runtime.Loader.dll"/> -->
+    <DistributedDlls Include="$(OutDir)\System.Text.Encoding.CodePages.dll"/>
+    <DistributedDlls Include="$(OutDir)\System.Threading.Tasks.Extensions.dll"/>
+    <DistributedDlls Include="$(OutDir)\Yort.Ntp.dll"/>
+
+    <DistributedDlls Include="$(OutDir)\emt-sdk.dll"/>
+  </ItemGroup>
+  <Target Name="UnityPackage" AfterTargets="build">
+    <Copy SourceFiles="$(PkgGrpc_Core)\runtimes\linux-x64\native\libgrpc_csharp_ext.x64.so"
+          DestinationFolder="$(OutDir)\UnityPackage\package\Runtime\native\linux-x64\libgrpc_csharp_ext.so"/>
+    <Copy SourceFiles="$(PkgGrpc_Core)\runtimes\win-x64\native\grpc_csharp_ext.x64.dll"
+          DestinationFiles="$(OutDir)\UnityPackage\package\Runtime\native\win-x64\grpc_csharp_ext.dll"/>
+    <Copy SourceFiles="@(DistributedDlls)"
+          DestinationFolder="$(OutDir)\UnityPackage\package\Runtime"/>
   </Target>
 
 </Project>
