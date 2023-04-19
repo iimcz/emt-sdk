@@ -115,7 +115,8 @@ namespace emt_sdk.Events.Relay
             if (!IsConnected)
             {
                 Logger.Error("Received event despite not being connected, relay is in inconsistent state");
-                throw new InvalidOperationException("Cannot relay event, no connection estabilished");
+                //throw new InvalidOperationException("Cannot relay event, no connection estabilished");
+                return; // TODO: we already log this, so just discard the event, but this should be discussed
             }
 
             Logger.Warn("Relaying local only event, this should not be used in final builds");
@@ -127,7 +128,8 @@ namespace emt_sdk.Events.Relay
             if (!IsConnected)
             {
                 Logger.Error("Received event despite not being connected, relay is in inconsistent state");
-                throw new InvalidOperationException("Cannot relay event, no connection estabilished");
+                //throw new InvalidOperationException("Cannot relay event, no connection estabilished");
+                return; // TODO: we already log this, so just discard the event, but this should be discussed
             }
 
             message.WriteDelimitedTo(_stream);
